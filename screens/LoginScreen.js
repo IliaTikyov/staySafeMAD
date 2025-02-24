@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -29,6 +29,8 @@ const LoginScreen = () => {
     } else {
       Alert.alert("You have enter a wrong email or password");
     }
+    setEmail("");
+    setPassword("");
   };
 
   return (
