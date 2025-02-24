@@ -6,11 +6,30 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
-const LoginPage = () => {
-  const [username, setUsername] = useState("");
+const LoginScreen = () => {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigation = useNavigation();
+
+  const LoginInfo = {
+    email: "ilia@gmail.com",
+    password: "ilia123",
+  };
+
+  const handleSubmit = () => {
+    if (
+      email.toLocaleLowerCase() === LoginInfo.email &&
+      password.toLocaleLowerCase() === LoginInfo.password
+    ) {
+      navigation.navigate("HomeScreen");
+    } else {
+      Alert.alert("You have enter a wrong email or password");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -26,6 +45,9 @@ const LoginPage = () => {
           style={styles.inputText}
           placeholder="Enter your email"
           placeholderTextColor="#A9A9A9"
+          value={email}
+          onChangeText={(text) => setEmail(text)}
+          keyboardType="email-address"
         />
       </View>
 
@@ -35,10 +57,12 @@ const LoginPage = () => {
           secureTextEntry
           placeholder="Enter your password"
           placeholderTextColor="#A9A9A9"
+          value={password}
+          onChangeText={(text) => setPassword(text)}
         />
       </View>
 
-      <TouchableOpacity style={styles.buttonContainer}>
+      <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
     </View>
@@ -51,7 +75,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#DCDCDC",
-    marginTop: 0,
   },
   logo: {
     width: 160,
@@ -71,7 +94,7 @@ const styles = StyleSheet.create({
     height: 50,
     marginBottom: 20,
     justifyContent: "center",
-    padding: 15,
+    paddingHorizontal: 15,
   },
   inputText: {
     height: 50,
@@ -92,4 +115,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginPage;
+export default LoginScreen;
