@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,12 +7,14 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
   const LoginInfo = {
@@ -22,51 +24,72 @@ const LoginScreen = () => {
 
   const handleSubmit = () => {
     if (
-      email.toLocaleLowerCase() === LoginInfo.email &&
-      password.toLocaleLowerCase() === LoginInfo.password
+      email.toLowerCase() === LoginInfo.email &&
+      password.toLowerCase() === LoginInfo.password
     ) {
-      navigation.navigate("HomeScreen");
+      setLoading(true);
+
+      setTimeout(() => {
+        setLoading(false);
+        navigation.navigate("HomeScreen");
+      }, 2000);
     } else {
-      Alert.alert("You have enter a wrong email or password");
+      Alert.alert("You have entered a wrong email or password");
     }
+
     setEmail("");
     setPassword("");
   };
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require("../Images/StaySafeLogo.png")}
-        style={styles.logo}
-      />
+      {loading ? (
+        <>
+          <Image
+            source={require("../Images/StaySafeLogo.png")}
+            style={styles.logo}
+          />
+          <Text style={styles.text}>Logging in...</Text>
+          <ActivityIndicator size="large" color="#00AEEF" />
+        </>
+      ) : (
+        <>
+          <Image
+            source={require("../Images/StaySafeLogo.png")}
+            style={styles.logo}
+          />
+          <Text style={styles.title}>Login Page</Text>
 
-      <Text style={styles.title}>Login Page</Text>
+          <View style={styles.inputView}>
+            <TextInput
+              style={styles.inputText}
+              placeholder="Enter your email"
+              placeholderTextColor="#A9A9A9"
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+              keyboardType="email-address"
+            />
+          </View>
 
-      <View style={styles.inputView}>
-        <TextInput
-          style={styles.inputText}
-          placeholder="Enter your email"
-          placeholderTextColor="#A9A9A9"
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-          keyboardType="email-address"
-        />
-      </View>
+          <View style={styles.inputView}>
+            <TextInput
+              style={styles.inputText}
+              secureTextEntry
+              placeholder="Enter your password"
+              placeholderTextColor="#A9A9A9"
+              value={password}
+              onChangeText={(text) => setPassword(text)}
+            />
+          </View>
 
-      <View style={styles.inputView}>
-        <TextInput
-          style={styles.inputText}
-          secureTextEntry
-          placeholder="Enter your password"
-          placeholderTextColor="#A9A9A9"
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.buttonContainer}
+            onPress={handleSubmit}
+          >
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </View>
   );
 };
@@ -114,6 +137,12 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  text: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "black",
+    marginBottom: 10,
   },
 });
 
