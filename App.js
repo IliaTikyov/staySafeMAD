@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import { Text, TouchableOpacity } from "react-native";
+import AddTripScreen from "./screens/AddTripScreen";
 
 const Stack = createStackNavigator();
 
@@ -42,6 +43,7 @@ const App = () => {
             ),
           })}
         />
+        <Stack.Screen name="Add" component={AddTripScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
