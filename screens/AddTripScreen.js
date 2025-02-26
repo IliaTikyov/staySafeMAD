@@ -21,19 +21,20 @@ const AddTripScreen = () => {
   const navigation = useNavigation();
 
   const handleSubmit = () => {
-    if (
-      !departure ||
-      !destination ||
-      !eta ||
-      !statusUpdate ||
-      !emergencyContact
-    ) {
+    if (!departure || !destination || !eta || !emergencyContact) {
       Alert.alert("Error", "Please fill in all fields before saving the trip.");
       return;
     }
 
-    Alert.alert("Trip Saved", "Your trip details have been recorded.");
-    navigation.goBack();
+    const newTrip = {
+      departure,
+      destination,
+      eta,
+      modeOfTravel,
+      emergencyContact,
+    };
+
+    navigation.navigate("HomeScreen", { newTrip });
   };
 
   return (
