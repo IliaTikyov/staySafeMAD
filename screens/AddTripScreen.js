@@ -32,6 +32,7 @@ const AddTripScreen = () => {
       eta,
       modeOfTravel,
       emergencyContact,
+      status: "Started",
     };
 
     navigation.navigate("HomeScreen", { newTrip });
