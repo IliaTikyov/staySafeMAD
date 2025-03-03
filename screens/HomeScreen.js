@@ -9,6 +9,7 @@ import {
 import { useRoute } from "@react-navigation/native";
 import Cards from "../components/UI/Cards";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { Picker } from "@react-native-picker/picker";
 
 const HomeScreen = ({ navigation }) => {
   const [trips, setTrips] = useState([]);
@@ -20,6 +21,26 @@ const HomeScreen = ({ navigation }) => {
       navigation.setParams({ newTrip: null });
     }
   }, [route.params?.newTrip]);
+
+  const changeStatus = (status) => {
+    if (status === "Started") {
+      return { color: "orange" };
+    } else if (status === "Completed") {
+      return { color: "green" };
+    } else if (status == "Paused") {
+      return { color: "gray" };
+    } else {
+      return { color: "red" };
+    }
+  };
+
+  const updateTripStatus = (index, newStatus) => {
+    setTrips((prevTrips) =>
+      prevTrips.map((trip, i) =>
+        i === index ? { ...trip, status: newStatus } : trip
+      )
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -34,16 +55,31 @@ const HomeScreen = ({ navigation }) => {
       <FlatList
         data={trips}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <Cards style={styles.card}>
             <Text style={styles.tripText}>
-              🚀 {item.departure} → {item.destination}
+              🚀 Destination: {item.departure} → {item.destination}
             </Text>
             <Text style={styles.tripText}>⏳ ETA: {item.eta}</Text>
             <Text style={styles.tripText}>🛣 Mode: {item.modeOfTravel}</Text>
             <Text style={styles.tripText}>
               📞 Contact: {item.emergencyContact}
             </Text>
+
+            <Text style={[styles.status, changeStatus(item.status)]}>
+              🏷 Status: {item.status}
+            </Text>
+
+            <Picker
+              selectedValue={item.status}
+              onValueChange={(newStatus) => updateTripStatus(index, newStatus)}
+              style={{ marginTop: 10 }}
+            >
+              <Picker.Item label="Started" value="Started" />
+              <Picker.Item label="Paused" value="Paused" />
+              <Picker.Item label="Completed" value="Completed" />
+              <Picker.Item label="Cancelled" value="Cancelled" />
+            </Picker>
           </Cards>
         )}
       />
@@ -80,6 +116,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     marginBottom: 5,
+  },
+  status: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 5,
   },
 });
 
