@@ -56,7 +56,10 @@ const HomeScreen = ({ navigation }) => {
         data={trips}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index }) => (
-          <Cards style={styles.card}>
+          <Cards
+            style={styles.card}
+            onPress={() => navigation.navigate("View", { trip: item })} // ✅ Now it works
+          >
             <Text style={styles.tripText}>
               🚀 Destination: {item.departure} → {item.destination}
             </Text>

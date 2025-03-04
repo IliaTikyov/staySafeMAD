@@ -5,6 +5,7 @@ import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import { Text, TouchableOpacity } from "react-native";
 import AddTripScreen from "./screens/AddTripScreen";
+import ViewTripScreen from "./screens/ViewTripScreen";
 
 const Stack = createStackNavigator();
 
@@ -44,6 +45,7 @@ const App = () => {
           })}
         />
         <Stack.Screen name="Add" component={AddTripScreen} />
+        <Stack.Screen name="View" component={ViewTripScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
