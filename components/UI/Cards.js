@@ -1,12 +1,14 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { TouchableOpacity, View, StyleSheet } from "react-native";
 
-const Cards = (props) => {
+const Cards = ({ children, onPress }) => {
   return (
-    <View style={styles.card}>
-      <View style={styles.content}></View>
-      {props.children}
-    </View>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+      <View style={[styles.card]}>
+        <View style={styles.content} />
+        {children}
+      </View>
+    </TouchableOpacity>
   );
 };
 
@@ -15,10 +17,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     elevation: 3,
     backgroundColor: "#fff",
-    shadowOffset: {
-      width: 1,
-      height: 1,
-    },
+    shadowOffset: { width: 1, height: 1 },
     shadowColor: "#333",
     shadowOpacity: 0.3,
     padding: 10,
