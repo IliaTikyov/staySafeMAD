@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AddTripScreen = () => {
   const [departure, setDeparture] = useState("");
@@ -20,13 +21,14 @@ const AddTripScreen = () => {
 
   const navigation = useNavigation();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!departure || !destination || !eta || !emergencyContact) {
       Alert.alert("Error", "Please fill in all fields before saving the trip.");
       return;
     }
 
     const newTrip = {
+      id: Date.now().toString(),
       departure,
       destination,
       eta,
@@ -34,7 +36,14 @@ const AddTripScreen = () => {
       emergencyContact,
       status: "Started",
     };
-
+    try {
+      const storedTrips = await AsyncStorage.getItem("trips");
+      const tripsArray = storedTrips ? JSON.parse(storedTrips) : [];
+      tripsArray.push(newTrip);
+      await AsyncStorage.setItem("trips", JSON.stringify(tripsArray));
+    } catch (error) {
+      console.error("Error saving trip:", error);
+    }
     navigation.navigate("HomeScreen", { newTrip });
   };
 
