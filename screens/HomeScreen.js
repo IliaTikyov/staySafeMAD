@@ -10,37 +10,18 @@ import { useRoute } from "@react-navigation/native";
 import Cards from "../components/UI/Cards";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HomeScreen = ({ navigation }) => {
   const [trips, setTrips] = useState([]);
   const route = useRoute();
 
   useEffect(() => {
-    const loadTrips = async () => {
-      try {
-        const storedTrips = await AsyncStorage.getItem("trips");
-        if (storedTrips) {
-          setTrips(JSON.parse(storedTrips));
-        }
-      } catch (error) {
-        console.error("Error loading trips:", error);
-      }
-    };
-    loadTrips();
-  }, []);
-
-  useEffect(() => {
     if (route.params?.newTrip) {
-      setTrips((prevTrips) => {
-        const updatedTrips = [...prevTrips, route.params.newTrip];
-        AsyncStorage.setItem("trips", JSON.stringify(updatedTrips));
-        return updatedTrips;
-      });
-
-      setTimeout(() => navigation.setParams({ newTrip: null }), 500);
+      setTrips((prevTrips) => [...prevTrips, route.params.newTrip]);
+      navigation.setParams({ newTrip: null });
     }
   }, [route.params?.newTrip]);
+
   const changeStatus = (status) => {
     if (status === "Started") {
       return { color: "orange" };
@@ -54,14 +35,15 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const updateTripStatus = (index, newStatus) => {
-    setTrips((prevTrips) => {
-      const updatedTrips = prevTrips.map((trip, i) =>
+    setTrips((prevTrips) =>
+      prevTrips.map((trip, i) =>
         i === index ? { ...trip, status: newStatus } : trip
-      );
+      )
+    );
+  };
 
-      AsyncStorage.setItem("trips", JSON.stringify(updatedTrips));
-      return updatedTrips;
-    });
+  const deleteTrip = (tripId) => {
+    setTrips((prevTrips) => prevTrips.filter((t) => t.id !== tripId));
   };
 
   return (
@@ -76,11 +58,16 @@ const HomeScreen = ({ navigation }) => {
 
       <FlatList
         data={trips}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index }) => (
           <Cards
             style={styles.card}
-            onPress={() => navigation.navigate("View", { trip: item })} // ✅ Now it works
+            onPress={() =>
+              navigation.navigate("View", {
+                trip: item,
+                onDelete: deleteTrip,
+              })
+            }
           >
             <Text style={styles.tripText}>
               🚀 Destination: {item.departure} → {item.destination}
