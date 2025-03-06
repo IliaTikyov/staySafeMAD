@@ -1,20 +1,41 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { View } from "react-native";
 import { Text } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { useRoute, useNavigation } from "@react-navigation/native";
 
 const ViewTripScreen = () => {
   const route = useRoute();
-  const { trip } = route.params; // ✅ Get trip data from navigation
+  const { trip, onDelete } = route.params;
+  const navigation = useNavigation();
 
-  if (!trip) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>No trip details available.</Text>
-      </View>
+  const goToModifyScreen = () => {
+    navigation.navigate("Modify", { trip });
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Confirm Deletion",
+      "Are you sure you want to delete this trip?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            if (onDelete) {
+              onDelete(trip.id);
+            }
+            navigation.goBack();
+          },
+        },
+      ],
+      { cancelable: true }
     );
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -27,6 +48,23 @@ const ViewTripScreen = () => {
         📞 Emergency Contact: {trip.emergencyContact}
       </Text>
       <Text style={styles.tripText}>🏷 Status: {trip.status}</Text>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.button, styles.modifyButton]}
+          activeOpacity={0.8}
+          onPress={goToModifyScreen}
+        >
+          <Text style={styles.buttonText}>Modify</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.deleteButton]}
+          activeOpacity={0.8}
+          onPress={handleDelete}
+        >
+          <Text style={styles.buttonText}>Delete</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -34,23 +72,45 @@ const ViewTripScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 32,
     backgroundColor: "#f8f9fa",
+    alignItems: "center",
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
+    marginTop: 16,
   },
   tripText: {
     fontSize: 18,
     marginBottom: 10,
   },
-  errorText: {
-    fontSize: 18,
-    color: "red",
-    textAlign: "center",
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    width: "100%",
+    marginTop: 25,
+  },
+  button: {
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 20,
+  },
+  modifyButton: {
+    backgroundColor: "#f97316",
+  },
+  deleteButton: {
+    backgroundColor: "#ef4444",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 
