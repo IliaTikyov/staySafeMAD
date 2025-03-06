@@ -16,13 +16,17 @@ const AddTripScreen = () => {
   const [destination, setDestination] = useState("");
   const [eta, setEta] = useState("");
   const [modeOfTravel, setModeOfTravel] = useState("walking");
-  // const [statusUpdate, setStatusUpdate] = useState("");
   const [emergencyContact, setEmergencyContact] = useState("");
 
   const navigation = useNavigation();
 
   const handleSubmit = async () => {
-    if (!departure || !destination || !eta || !emergencyContact) {
+    if (
+      !departure.trim() ||
+      !destination.trim() ||
+      !eta.trim() ||
+      !emergencyContact.trim()
+    ) {
       Alert.alert("Error", "Please fill in all fields before saving the trip.");
       return;
     }
@@ -36,14 +40,10 @@ const AddTripScreen = () => {
       emergencyContact,
       status: "Started",
     };
-    try {
-      const storedTrips = await AsyncStorage.getItem("trips");
-      const tripsArray = storedTrips ? JSON.parse(storedTrips) : [];
-      tripsArray.push(newTrip);
-      await AsyncStorage.setItem("trips", JSON.stringify(tripsArray));
-    } catch (error) {
-      console.error("Error saving trip:", error);
-    }
+    const storedTrips = await AsyncStorage.getItem("trips");
+    const tripsArray = storedTrips ? JSON.parse(storedTrips) : [];
+    tripsArray.push(newTrip);
+    await AsyncStorage.setItem("trips", JSON.stringify(tripsArray));
     navigation.navigate("HomeScreen", { newTrip });
   };
 
@@ -116,14 +116,14 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   input: {
-    width: "100%",
+    fontSize: 16,
     backgroundColor: "#fff",
+    width: "100%",
     borderRadius: 8,
     padding: 12,
     marginBottom: 15,
     borderWidth: 1,
     borderColor: "#ddd",
-    fontSize: 16,
     color: "#333",
   },
   label: {

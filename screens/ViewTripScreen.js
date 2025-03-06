@@ -6,11 +6,18 @@ import { useRoute, useNavigation } from "@react-navigation/native";
 
 const ViewTripScreen = () => {
   const route = useRoute();
-  const { trip, onDelete } = route.params;
+  const { trip, onDelete, onModify } = route.params;
   const navigation = useNavigation();
 
   const goToModifyScreen = () => {
-    navigation.navigate("Modify", { trip });
+    navigation.navigate("Modify", { trip, onModify: handleModified });
+  };
+
+  const handleModified = (updatedTrip) => {
+    if (onModify) {
+      onModify(updatedTrip);
+      navigation.setParams({ trip: updatedTrip });
+    }
   };
 
   const handleDelete = () => {
@@ -18,10 +25,7 @@ const ViewTripScreen = () => {
       "Confirm Deletion",
       "Are you sure you want to delete this trip?",
       [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
+        { text: "Cancel", style: "cancel" },
         {
           text: "Delete",
           style: "destructive",
