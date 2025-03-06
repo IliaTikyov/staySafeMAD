@@ -10,18 +10,33 @@ import { useRoute } from "@react-navigation/native";
 import Cards from "../components/UI/Cards";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HomeScreen = ({ navigation }) => {
   const [trips, setTrips] = useState([]);
   const route = useRoute();
 
   useEffect(() => {
+    const loadTrips = async () => {
+      const storedTrips = await AsyncStorage.getItem("trips");
+      if (storedTrips) {
+        setTrips(JSON.parse(storedTrips));
+      }
+    };
+    loadTrips();
+  }, []);
+
+  useEffect(() => {
     if (route.params?.newTrip) {
-      setTrips((prevTrips) => [...prevTrips, route.params.newTrip]);
-      navigation.setParams({ newTrip: null });
+      setTrips((prevTrips) => {
+        const updatedTrips = [...prevTrips, route.params.newTrip];
+        AsyncStorage.setItem("trips", JSON.stringify(updatedTrips));
+        return updatedTrips;
+      });
+
+      setTimeout(() => navigation.setParams({ newTrip: null }), 500);
     }
   }, [route.params?.newTrip]);
-
   const changeStatus = (status) => {
     if (status === "Started") {
       return { color: "orange" };
@@ -35,15 +50,32 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const updateTripStatus = (index, newStatus) => {
-    setTrips((prevTrips) =>
-      prevTrips.map((trip, i) =>
+    setTrips((prevTrips) => {
+      const updatedTrips = prevTrips.map((trip, i) =>
         i === index ? { ...trip, status: newStatus } : trip
-      )
-    );
+      );
+
+      AsyncStorage.setItem("trips", JSON.stringify(updatedTrips));
+      return updatedTrips;
+    });
+  };
+
+  const updateTripDetails = (updatedTrip) => {
+    setTrips((prevTrips) => {
+      const updatedTrips = prevTrips.map((trip) =>
+        trip.id === updatedTrip.id ? { ...trip, ...updatedTrip } : trip
+      );
+      AsyncStorage.setItem("trips", JSON.stringify(updatedTrips));
+      return updatedTrips;
+    });
   };
 
   const deleteTrip = (tripId) => {
-    setTrips((prevTrips) => prevTrips.filter((t) => t.id !== tripId));
+    setTrips((prevTrips) => {
+      const updatedTrips = prevTrips.filter((t) => t.id !== tripId);
+      AsyncStorage.setItem("trips", JSON.stringify(updatedTrips));
+      return updatedTrips;
+    });
   };
 
   return (
@@ -58,7 +90,7 @@ const HomeScreen = ({ navigation }) => {
 
       <FlatList
         data={trips}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(index) => index.toString()}
         renderItem={({ item, index }) => (
           <Cards
             style={styles.card}
@@ -66,11 +98,12 @@ const HomeScreen = ({ navigation }) => {
               navigation.navigate("View", {
                 trip: item,
                 onDelete: deleteTrip,
+                onModify: updateTripDetails,
               })
             }
           >
             <Text style={styles.tripText}>
-              🚀 Destination: {item.departure} → {item.destination}
+              📍 Destination: {item.departure} → {item.destination}
             </Text>
             <Text style={styles.tripText}>⏳ ETA: {item.eta}</Text>
             <Text style={styles.tripText}>🛣 Mode: {item.modeOfTravel}</Text>
