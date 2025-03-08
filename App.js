@@ -2,12 +2,13 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import LoginScreen from "./screens/LoginScreen";
-import HomeScreen from "./screens/HomeScreen";
 import { Text, TouchableOpacity } from "react-native";
-import AddTripScreen from "./screens/AddTripScreen";
-import ViewTripScreen from "./screens/ViewTripScreen";
-import ModifyTripScreen from "./screens/ModifyTripScreen";
-
+import ActivityScreen from "./screens/ActivityScreens/ActivityScreen";
+import AddTripScreen from "./screens/ActivityScreens/AddTripScreen";
+import ModifyTripScreen from "./screens/ActivityScreens/ModifyTripScreen";
+import ViewTripScreen from "./screens/ActivityScreens/ViewTripScreen";
+import HomeScreen from "./screens/HomeScreen";
+import StatusScreen from "./screens/StatusScreen/StatusScreen";
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -20,10 +21,20 @@ const App = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="ActivityScreen"
+          component={ActivityScreen}
+          options={{ title: "Activities" }}
+        />
+        <Stack.Screen
+          name="StatusScreen"
+          component={StatusScreen}
+          options={{ title: "Status" }}
+        />
+        <Stack.Screen
           name="HomeScreen"
           component={HomeScreen}
           options={({ navigation }) => ({
-            title: "Home",
+            title: "Activities",
             headerLeft: () => null,
             headerRight: () => (
               <TouchableOpacity onPress={() => navigation.replace("Login")}>

@@ -1,25 +1,18 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
-import { createActivity } from "../api/activityApi";
+import { createActivity } from "../../api/activityApi";
 
 const AddTripScreen = ({ navigation }) => {
   const [tripName, setTripName] = useState("");
   const [description, setDescription] = useState("");
-  const [fromID, setFromID] = useState("");
-  const [toID, setToID] = useState("");
+  const [fromID, setFromID] = useState("1");
+  const [toID, setToID] = useState("1");
   const [leaveTime, setLeaveTime] = useState("");
   const [arriveTime, setArriveTime] = useState("");
   const [statusID, setStatusID] = useState("1");
 
   const handleSave = async () => {
-    if (
-      !tripName ||
-      !description ||
-      !fromID ||
-      !toID ||
-      !leaveTime ||
-      !arriveTime
-    ) {
+    if (!tripName || !description || !leaveTime || !arriveTime) {
       Alert.alert("Missing Information", "Please fill in all fields.");
       return;
     }
@@ -80,22 +73,6 @@ const AddTripScreen = ({ navigation }) => {
         onChangeText={setDescription}
       />
 
-      <Text style={styles.label}>From Location ID:</Text>
-      <TextInput
-        style={styles.input}
-        value={fromID}
-        onChangeText={setFromID}
-        keyboardType="numeric"
-      />
-
-      <Text style={styles.label}>To Location ID:</Text>
-      <TextInput
-        style={styles.input}
-        value={toID}
-        onChangeText={setToID}
-        keyboardType="numeric"
-      />
-
       <Text style={styles.label}>Leave Time (YYYY-MM-DD HH:MM):</Text>
       <TextInput
         style={styles.input}
@@ -124,7 +101,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     marginBottom: 5,
   },
