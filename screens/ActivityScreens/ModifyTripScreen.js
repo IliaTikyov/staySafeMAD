@@ -8,7 +8,7 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { updateActivity } from "../api/activityApi";
+import { updateActivity } from "../../api/activityApi";
 
 const ModifyTripScreen = () => {
   const navigation = useNavigation();
@@ -42,24 +42,27 @@ const ModifyTripScreen = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Modify Trip</Text>
 
+      <Text style={styles.label}>Trip Name (Activity Name)</Text>
       <TextInput
         style={styles.input}
         value={tripName}
         onChangeText={setTripName}
       />
 
+      <Text style={styles.label}> Description </Text>
       <TextInput
         style={styles.input}
         value={description}
         onChangeText={setDescription}
       />
 
+      <Text style={styles.label}>Leave Time (YYYY-MM-DD HH:MM):</Text>
       <TextInput
         style={styles.input}
         value={leaveTime}
         onChangeText={setLeaveTime}
       />
-
+      <Text style={styles.label}>Arrive Time (YYYY-MM-DD HH:MM):</Text>
       <TextInput
         style={styles.input}
         value={arriveTime}
@@ -76,32 +79,27 @@ const ModifyTripScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 32,
     backgroundColor: "#f8f9fa",
-    paddingTop: 16,
-    paddingHorizontal: 16,
-    alignItems: "center",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-  },
-  input: {
-    backgroundColor: "#fff",
-    borderColor: "#ddd",
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 15,
-    fontSize: 16,
-    width: "90%",
+    alignSelf: "center",
   },
   label: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#555",
-    marginBottom: 8,
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
   },
   saveButton: {
     backgroundColor: "#f97316",
@@ -111,6 +109,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 10,
     width: "50%",
+    alignSelf: "center",
   },
   buttonText: {
     color: "#fff",
