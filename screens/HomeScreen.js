@@ -1,82 +1,47 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
+  FlatList,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
 } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { getActivities } from "../api/activityApi";
 import Cards from "../components/UI/Cards";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { Picker } from "@react-native-picker/picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
-const HomeScreen = ({ navigation }) => {
-  const [trips, setTrips] = useState([]);
-  const route = useRoute();
+const HomeScreen = () => {
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
-  useEffect(() => {
-    const loadTrips = async () => {
-      const storedTrips = await AsyncStorage.getItem("trips");
-      if (storedTrips) {
-        setTrips(JSON.parse(storedTrips));
-      }
-    };
-    loadTrips();
-  }, []);
-
-  useEffect(() => {
-    if (route.params?.newTrip) {
-      setTrips((prevTrips) => {
-        const updatedTrips = [...prevTrips, route.params.newTrip];
-        AsyncStorage.setItem("trips", JSON.stringify(updatedTrips));
-        return updatedTrips;
-      });
-
-      setTimeout(() => navigation.setParams({ newTrip: null }), 500);
-    }
-  }, [route.params?.newTrip]);
-  const changeStatus = (status) => {
-    if (status === "Started") {
-      return { color: "orange" };
-    } else if (status === "Completed") {
-      return { color: "green" };
-    } else if (status == "Paused") {
-      return { color: "gray" };
-    } else {
-      return { color: "red" };
+  const fetchActivities = async () => {
+    try {
+      const data = await getActivities();
+      setActivities(data);
+    } catch (error) {
+      console.error("Failed to load activities:", error);
     }
   };
 
-  const updateTripStatus = (index, newStatus) => {
-    setTrips((prevTrips) => {
-      const updatedTrips = prevTrips.map((trip, i) =>
-        i === index ? { ...trip, status: newStatus } : trip
-      );
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
 
-      AsyncStorage.setItem("trips", JSON.stringify(updatedTrips));
-      return updatedTrips;
-    });
-  };
+      const fetchData = async () => {
+        if (isActive) {
+          await fetchActivities();
+        }
+      };
 
-  const updateTripDetails = (updatedTrip) => {
-    setTrips((prevTrips) => {
-      const updatedTrips = prevTrips.map((trip) =>
-        trip.id === updatedTrip.id ? { ...trip, ...updatedTrip } : trip
-      );
-      AsyncStorage.setItem("trips", JSON.stringify(updatedTrips));
-      return updatedTrips;
-    });
-  };
+      fetchData();
 
-  const deleteTrip = (tripId) => {
-    setTrips((prevTrips) => {
-      const updatedTrips = prevTrips.filter((t) => t.id !== tripId);
-      AsyncStorage.setItem("trips", JSON.stringify(updatedTrips));
-      return updatedTrips;
-    });
-  };
+      return () => {
+        isActive = false;
+      };
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
@@ -84,47 +49,34 @@ const HomeScreen = ({ navigation }) => {
         style={styles.addButton}
         onPress={() => navigation.navigate("Add")}
       >
-        <Icon name="plus" size={15} color="white" />
+        <Icon name="plus" size={16} style={styles.plusIcon} />
         <Text style={styles.buttonText}>Add Trip</Text>
       </TouchableOpacity>
 
       <FlatList
-        data={trips}
-        keyExtractor={(index) => index.toString()}
-        renderItem={({ item, index }) => (
+        data={activities}
+        keyExtractor={(item) => item.ActivityID.toString()}
+        renderItem={({ item }) => (
           <Cards
-            style={styles.card}
             onPress={() =>
               navigation.navigate("View", {
-                trip: item,
-                onDelete: deleteTrip,
-                onModify: updateTripDetails,
+                activity: item,
               })
             }
           >
-            <Text style={styles.tripText}>
-              📍 Destination: {item.departure} → {item.destination}
+            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+              {item.ActivityName}
             </Text>
-            <Text style={styles.tripText}>⏳ ETA: {item.eta}</Text>
-            <Text style={styles.tripText}>🛣 Mode: {item.modeOfTravel}</Text>
-            <Text style={styles.tripText}>
-              📞 Contact: {item.emergencyContact}
-            </Text>
-
-            <Text style={[styles.status, changeStatus(item.status)]}>
-              🏷 Status: {item.status}
-            </Text>
-
-            <Picker
-              selectedValue={item.status}
-              onValueChange={(newStatus) => updateTripStatus(index, newStatus)}
-              style={{ marginTop: 10 }}
+            <Text>{item.ActivityDescription}</Text>
+            <Text
+              style={{
+                fontWeight: "bold",
+                color:
+                  item.ActivityStatusName === "Completed" ? "green" : "orange",
+              }}
             >
-              <Picker.Item label="Started" value="Started" />
-              <Picker.Item label="Paused" value="Paused" />
-              <Picker.Item label="Completed" value="Completed" />
-              <Picker.Item label="Cancelled" value="Cancelled" />
-            </Picker>
+              Status: {item.ActivityStatusName}
+            </Text>
           </Cards>
         )}
       />
@@ -149,6 +101,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+  },
+  plusIcon: {
+    color: "white",
   },
   buttonText: {
     color: "white",
