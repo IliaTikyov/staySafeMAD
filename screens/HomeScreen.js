@@ -13,7 +13,6 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 const HomeScreen = () => {
   const [activities, setActivities] = useState([]);
-  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
   const fetchActivities = async () => {

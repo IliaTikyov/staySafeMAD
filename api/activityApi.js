@@ -13,8 +13,9 @@ export const createActivity = async (activityData) => {
   return await apiRequest("/activities", "POST", requestData);
 };
 
-export const updateActivity = async (activityId, updatedData) => {
-  return await apiRequest(`/activities/${activityId}`, "PUT", updatedData);
+export const updateActivity = async (activityData) => {
+  const { ActivityID, ...updatedFields } = activityData;
+  return await apiRequest(`/activities/${ActivityID}`, "PUT", updatedFields);
 };
 
 export const deleteActivity = async (activityID) => {
