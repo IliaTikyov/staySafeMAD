@@ -8,10 +8,11 @@ import {
 } from "react-native";
 import { getActivities } from "../../api/activityApi";
 import Cards from "../../components/UI/Cards";
+import Button from "../../components/UI/Button";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
-const HomeScreen = () => {
+const ActivityScreen = () => {
   const [activities, setActivities] = useState([]);
   const navigation = useNavigation();
 
@@ -44,13 +45,12 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.navigate("Add")}
-      >
-        <Icon name="plus" size={16} style={styles.plusIcon} />
-        <Text style={styles.buttonText}>Add Trip</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <Button onPress={() => navigation.navigate("Add")}>
+          <Icon name="plus" size={14} style={styles.plusIcon} />
+          Add Activity (Trips)
+        </Button>
+      </View>
 
       <FlatList
         data={activities}
@@ -89,20 +89,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f9fa",
     paddingTop: 16,
   },
+  buttonContainer: {
+    alignItems: "center",
+  },
   addButton: {
     backgroundColor: "#42a5f5",
     padding: 16,
     borderRadius: 8,
-    alignItems: "center",
-    alignSelf: "stretch",
     marginHorizontal: 16,
     marginTop: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: "flex-end",
+    justifyContent: "flex-end",
   },
   plusIcon: {
     color: "white",
+    marginRight: 6,
   },
   buttonText: {
     color: "white",
@@ -123,4 +124,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default ActivityScreen;

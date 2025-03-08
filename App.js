@@ -34,7 +34,7 @@ const App = () => {
           name="HomeScreen"
           component={HomeScreen}
           options={({ navigation }) => ({
-            title: "Activities",
+            title: "Home",
             headerLeft: () => null,
             headerRight: () => (
               <TouchableOpacity onPress={() => navigation.replace("Login")}>

@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import Button from "../components/UI/Button";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -9,18 +10,13 @@ const HomeScreen = () => {
     <View style={styles.container}>
       <Text style={styles.title}>StaySafe App</Text>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("ActivityScreen")}
-      >
-        <Text style={styles.buttonText}>Activities (Trips)</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("StatusScreen")}
-      >
-        <Text style={styles.buttonText}>Status</Text>
-      </TouchableOpacity>
+      <Button onPress={() => navigation.navigate("ActivityScreen")}>
+        Activities (Trips)
+      </Button>
+
+      <Button onPress={() => navigation.navigate("StatusScreen")}>
+        Status
+      </Button>
     </View>
   );
 };
