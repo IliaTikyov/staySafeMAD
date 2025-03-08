@@ -13,9 +13,8 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 const ModifyTripScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { trip, onModify } = route.params; // Access onModify here
+  const { trip, onModify } = route.params; 
 
-  // Initialize state with trip's current values
   const [departure, setDeparture] = useState(trip.departure);
   const [destination, setDestination] = useState(trip.destination);
   const [eta, setEta] = useState(trip.eta);
@@ -31,7 +30,7 @@ const ModifyTripScreen = () => {
       !eta.trim() ||
       !emergencyContact.trim()
     ) {
-      Alert.alert("Error", "Please fill in all fields before saving.");
+      Alert.alert("Error", "Please make sure all fields are filled");
       return;
     }
 
@@ -44,11 +43,9 @@ const ModifyTripScreen = () => {
       emergencyContact: emergencyContact.trim(),
     };
 
-    // Call the onModify callback with the updated trip
     if (onModify) {
       onModify(updatedTrip);
     }
-    // Navigate back to the previous screen
     navigation.goBack();
   };
 

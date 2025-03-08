@@ -1,103 +1,118 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { createActivity } from "../api/activityApi";
 
-const AddTripScreen = () => {
-  const [departure, setDeparture] = useState("");
-  const [destination, setDestination] = useState("");
-  const [eta, setEta] = useState("");
-  const [modeOfTravel, setModeOfTravel] = useState("walking");
-  const [emergencyContact, setEmergencyContact] = useState("");
+const AddTripScreen = ({ navigation }) => {
+  const [tripName, setTripName] = useState("");
+  const [description, setDescription] = useState("");
+  const [fromID, setFromID] = useState("");
+  const [toID, setToID] = useState("");
+  const [leaveTime, setLeaveTime] = useState("");
+  const [arriveTime, setArriveTime] = useState("");
+  const [statusID, setStatusID] = useState("1");
 
-  const navigation = useNavigation();
-
-  const handleSubmit = async () => {
+  const handleSave = async () => {
     if (
-      !departure.trim() ||
-      !destination.trim() ||
-      !eta.trim() ||
-      !emergencyContact.trim()
+      !tripName ||
+      !description ||
+      !fromID ||
+      !toID ||
+      !leaveTime ||
+      !arriveTime
     ) {
-      Alert.alert("Error", "Please fill in all fields before saving the trip.");
+      Alert.alert("Missing Information", "Please fill in all fields.");
+      return;
+    }
+
+    const trimmedTripName = tripName.trim();
+    const trimmedDescription = description.trim();
+
+    if (trimmedTripName.length < 8) {
+      Alert.alert(
+        "Invalid Input",
+        "Trip name must be at least 8 characters long."
+      );
+      return;
+    }
+    if (trimmedDescription.length < 8) {
+      Alert.alert(
+        "Invalid Input",
+        "Description must be at least 8 characters long."
+      );
       return;
     }
 
     const newTrip = {
-      id: Date.now().toString(),
-      departure,
-      destination,
-      eta,
-      modeOfTravel,
-      emergencyContact,
-      status: "Started",
+      ActivityID: null,
+      ActivityName: trimmedTripName,
+      ActivityDescription: trimmedDescription,
+      ActivityStatusID: parseInt(statusID),
+      ActivityUserID: 1,
+      ActivityFromID: parseInt(fromID),
+      ActivityToID: parseInt(toID),
+      ActivityLeave: new Date(leaveTime).toISOString(),
+      ActivityArrive: new Date(arriveTime).toISOString(),
     };
-    const storedTrips = await AsyncStorage.getItem("trips");
-    const tripsArray = storedTrips ? JSON.parse(storedTrips) : [];
-    tripsArray.push(newTrip);
-    await AsyncStorage.setItem("trips", JSON.stringify(tripsArray));
-    navigation.navigate("HomeScreen", { newTrip });
+
+    try {
+      await createActivity(newTrip);
+      Alert.alert("Success", "Trip created successfully!");
+      navigation.goBack();
+    } catch (error) {
+      console.error("Failed to create trip:", error);
+      Alert.alert("Error", "Failed to save trip.");
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Add a New Trip</Text>
-
+      <Text style={styles.label}>Trip Name:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Departure Location"
-        placeholderTextColor="#888"
-        value={departure}
-        onChangeText={setDeparture}
+        value={tripName}
+        onChangeText={setTripName}
       />
 
+      <Text style={styles.label}>Description:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Destination"
-        placeholderTextColor="#888"
-        value={destination}
-        onChangeText={setDestination}
+        value={description}
+        onChangeText={setDescription}
       />
 
+      <Text style={styles.label}>From Location ID:</Text>
       <TextInput
         style={styles.input}
-        placeholder="ETA (e.g., 12:30 PM)"
-        placeholderTextColor="#888"
-        value={eta}
-        onChangeText={setEta}
-        keyboardType="default"
+        value={fromID}
+        onChangeText={setFromID}
+        keyboardType="numeric"
       />
 
-      <Text style={styles.label}>Mode of Travel:</Text>
-      <View style={styles.pickerContainer}>
-        <Picker selectedValue={modeOfTravel} onValueChange={setModeOfTravel}>
-          <Picker.Item label="Walking" value="walking" />
-          <Picker.Item label="Jogging" value="jogging" />
-          <Picker.Item label="Cycling" value="cycling" />
-          <Picker.Item label="Taxi Trip" value="taxi" />
-        </Picker>
-      </View>
-
+      <Text style={styles.label}>To Location ID:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Emergency Contact (Phone Number)"
-        placeholderTextColor="#888"
-        value={emergencyContact}
-        onChangeText={setEmergencyContact}
-        keyboardType="phone-pad"
+        value={toID}
+        onChangeText={setToID}
+        keyboardType="numeric"
       />
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Save Trip</Text>
-      </TouchableOpacity>
+      <Text style={styles.label}>Leave Time (YYYY-MM-DD HH:MM):</Text>
+      <TextInput
+        style={styles.input}
+        value={leaveTime}
+        onChangeText={setLeaveTime}
+        placeholder="2025-03-10 12:00"
+      />
+
+      <Text style={styles.label}>Arrive Time (YYYY-MM-DD HH:MM):</Text>
+      <TextInput
+        style={styles.input}
+        value={arriveTime}
+        onChangeText={setArriveTime}
+        placeholder="2025-03-10 14:00"
+      />
+
+      <Button title="Save Trip" onPress={handleSave} />
     </View>
   );
 };
@@ -106,50 +121,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f8f9fa",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-    color: "#333",
-  },
-  input: {
-    fontSize: 16,
     backgroundColor: "#fff",
-    width: "100%",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    color: "#333",
   },
   label: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
     marginBottom: 5,
   },
-  pickerContainer: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
+  input: {
     borderWidth: 1,
-    borderColor: "#ddd",
-    marginBottom: 15,
-  },
-  saveButton: {
-    backgroundColor: "#42a5f5",
-    padding: 16,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
   },
 });
 

@@ -1,26 +1,18 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity, Alert } from "react-native";
-import { View } from "react-native";
-import { Text } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
+import { deleteActivity } from "../api/activityApi";
 
 const ViewTripScreen = () => {
   const route = useRoute();
-  const { trip, onDelete, onModify } = route.params;
   const navigation = useNavigation();
+  const { activity } = route.params;
 
   const goToModifyScreen = () => {
-    navigation.navigate("Modify", { trip, onModify: handleModified });
+    navigation.navigate("ModifyTrip", { activity });
   };
 
-  const handleModified = (updatedTrip) => {
-    if (onModify) {
-      onModify(updatedTrip);
-      navigation.setParams({ trip: updatedTrip });
-    }
-  };
-
-  const handleDelete = () => {
+  const handleDelete = async () => {
     Alert.alert(
       "Confirm Deletion",
       "Are you sure you want to delete this trip?",
@@ -29,29 +21,55 @@ const ViewTripScreen = () => {
         {
           text: "Delete",
           style: "destructive",
-          onPress: () => {
-            if (onDelete) {
-              onDelete(trip.id);
+          onPress: async () => {
+            try {
+              await deleteActivity(activity.ActivityID);
+              Alert.alert("Success", "Trip deleted successfully!");
+              navigation.goBack();
+            } catch (error) {
+              console.error("Failed to delete trip:", error);
+              Alert.alert("Error", "Failed to delete trip.");
             }
-            navigation.goBack();
           },
         },
-      ],
-      { cancelable: true }
+      ]
     );
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Trip Details</Text>
-      <Text style={styles.tripText}>🚀 From: {trip.departure}</Text>
-      <Text style={styles.tripText}>📍 Destination: {trip.destination}</Text>
-      <Text style={styles.tripText}>⏳ ETA: {trip.eta}</Text>
-      <Text style={styles.tripText}>🛣 Mode: {trip.modeOfTravel}</Text>
-      <Text style={styles.tripText}>
-        📞 Emergency Contact: {trip.emergencyContact}
-      </Text>
-      <Text style={styles.tripText}>🏷 Status: {trip.status}</Text>
+      <Text style={styles.title}>{activity.ActivityName}</Text>
+      <Text style={styles.description}>{activity.ActivityDescription}</Text>
+
+      <View style={styles.detailRow}>
+        <Text style={styles.label}>From:</Text>
+        <Text style={styles.valueText}>{activity.ActivityFromName}</Text>
+      </View>
+
+      <View style={styles.detailRow}>
+        <Text style={styles.label}>To:</Text>
+        <Text style={styles.valueText}>{activity.ActivityToName}</Text>
+      </View>
+
+      <View style={styles.detailRow}>
+        <Text style={styles.label}>Leave Time:</Text>
+        <Text style={styles.valueText}>
+          {new Date(activity.ActivityLeave).toLocaleString()}
+        </Text>
+      </View>
+
+      <View style={styles.detailRow}>
+        <Text style={styles.label}>Arrival Time:</Text>
+        <Text style={styles.valueText}>
+          {new Date(activity.ActivityArrive).toLocaleString()}
+        </Text>
+      </View>
+
+      <View style={styles.detailRow}>
+        <Text style={styles.label}>Status:</Text>
+        <Text style={styles.valueText}>{activity.ActivityStatusName}</Text>
+      </View>
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.modifyButton]}
@@ -78,7 +96,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 32,
     backgroundColor: "#f8f9fa",
-    alignItems: "center",
   },
   title: {
     fontSize: 28,
@@ -87,9 +104,26 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 16,
   },
-  tripText: {
+  description: {
+    color: "gray",
     fontSize: 18,
-    marginBottom: 10,
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  detailRow: {
+    flexDirection: "row",
+    marginBottom: 8,
+    alignItems: "center",
+  },
+  label: {
+    fontWeight: "600",
+    fontSize: 16,
+    marginRight: 4,
+  },
+  valueText: {
+    color: "#1D3557",
+    fontWeight: "300",
+    fontSize: 16,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -101,8 +135,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 32,
-    alignItems: "center",
-    justifyContent: "center",
     marginHorizontal: 20,
   },
   modifyButton: {

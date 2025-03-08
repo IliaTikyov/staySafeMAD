@@ -16,18 +16,18 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 6,
     elevation: 3,
+    padding: 14,
+    alignSelf: "center",
+    width: "90%",
+    maxWidth: 400,
+    marginTop: 13,
     backgroundColor: "#fff",
     shadowOffset: { width: 1, height: 1 },
     shadowColor: "#333",
     shadowOpacity: 0.3,
-    padding: 10,
-    alignSelf: "center",
-    width: "90%",
-    maxWidth: 400,
-    marginTop: 12,
   },
   content: {
-    padding: 10,
+    padding: 2,
   },
 });
 
