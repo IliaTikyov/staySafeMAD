@@ -7,46 +7,35 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { updateActivity } from "../api/activityApi";
 
 const ModifyTripScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { trip, onModify } = route.params; 
+  const { activity } = route.params;
 
-  const [departure, setDeparture] = useState(trip.departure);
-  const [destination, setDestination] = useState(trip.destination);
-  const [eta, setEta] = useState(trip.eta);
-  const [modeOfTravel, setModeOfTravel] = useState(trip.modeOfTravel);
-  const [emergencyContact, setEmergencyContact] = useState(
-    trip.emergencyContact
-  );
+  const [tripName, setTripName] = useState(activity.ActivityName);
+  const [description, setDescription] = useState(activity.ActivityDescription);
+  const [leaveTime, setLeaveTime] = useState(activity.ActivityLeave);
+  const [arriveTime, setArriveTime] = useState(activity.ActivityArrive);
 
-  const handleSubmit = () => {
-    if (
-      !departure.trim() ||
-      !destination.trim() ||
-      !eta.trim() ||
-      !emergencyContact.trim()
-    ) {
-      Alert.alert("Error", "Please make sure all fields are filled");
-      return;
-    }
-
-    const updatedTrip = {
-      ...trip,
-      departure: departure.trim(),
-      destination: destination.trim(),
-      eta: eta.trim(),
-      modeOfTravel,
-      emergencyContact: emergencyContact.trim(),
+  const handleSubmit = async () => {
+    const updateInfo = {
+      ActivityID: activity.ActivityID,
+      ActivityName: tripName,
+      ActivityDescription: description,
+      ActivityLeave: leaveTime,
+      ActivityArrive: arriveTime,
     };
-
-    if (onModify) {
-      onModify(updatedTrip);
-    }
-    navigation.goBack();
+    await updateActivity(updateInfo);
+    console.log("Updated Trip Data:", {
+      tripName,
+      description,
+      leaveTime,
+      arriveTime,
+    });
+    navigation.navigate("View", { activity: updateInfo, refresh: true });
   };
 
   return (
@@ -55,50 +44,30 @@ const ModifyTripScreen = () => {
 
       <TextInput
         style={styles.input}
-        placeholder="Departure Location"
-        placeholderTextColor="#888"
-        value={departure}
-        onChangeText={setDeparture}
+        value={tripName}
+        onChangeText={setTripName}
       />
 
       <TextInput
         style={styles.input}
-        placeholder="Destination"
-        placeholderTextColor="#888"
-        value={destination}
-        onChangeText={setDestination}
+        value={description}
+        onChangeText={setDescription}
       />
 
       <TextInput
         style={styles.input}
-        placeholder="ETA (e.g., 12:30 PM)"
-        placeholderTextColor="#888"
-        value={eta}
-        onChangeText={setEta}
-        keyboardType="default"
+        value={leaveTime}
+        onChangeText={setLeaveTime}
       />
-
-      <Text style={styles.label}>Mode of Travel:</Text>
-      <View style={styles.pickerContainer}>
-        <Picker selectedValue={modeOfTravel} onValueChange={setModeOfTravel}>
-          <Picker.Item label="Walking" value="walking" />
-          <Picker.Item label="Jogging" value="jogging" />
-          <Picker.Item label="Cycling" value="cycling" />
-          <Picker.Item label="Taxi Trip" value="taxi" />
-        </Picker>
-      </View>
 
       <TextInput
         style={styles.input}
-        placeholder="Emergency Contact (Phone Number)"
-        placeholderTextColor="#888"
-        value={emergencyContact}
-        onChangeText={setEmergencyContact}
-        keyboardType="phone-pad"
+        value={arriveTime}
+        onChangeText={setArriveTime}
       />
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Update Trip</Text>
+        <Text style={styles.buttonText}>Update</Text>
       </TouchableOpacity>
     </View>
   );
@@ -110,6 +79,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f9fa",
     paddingTop: 16,
     paddingHorizontal: 16,
+    alignItems: "center",
   },
   title: {
     fontSize: 24,
@@ -125,6 +95,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 15,
     fontSize: 16,
+    width: "90%",
   },
   label: {
     fontSize: 16,
@@ -132,19 +103,14 @@ const styles = StyleSheet.create({
     color: "#555",
     marginBottom: 8,
   },
-  pickerContainer: {
-    backgroundColor: "#fff",
-    borderColor: "#ddd",
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
   saveButton: {
-    backgroundColor: "#42a5f5",
+    backgroundColor: "#f97316",
     padding: 16,
     borderRadius: 8,
     alignItems: "center",
-    marginTop: 15,
+    justifyContent: "center",
+    marginTop: 10,
+    width: "50%",
   },
   buttonText: {
     color: "#fff",

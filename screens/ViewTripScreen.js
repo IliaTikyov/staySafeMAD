@@ -9,7 +9,7 @@ const ViewTripScreen = () => {
   const { activity } = route.params;
 
   const goToModifyScreen = () => {
-    navigation.navigate("ModifyTrip", { activity });
+    navigation.navigate("Modify", { activity: activity });
   };
 
   const handleDelete = async () => {
