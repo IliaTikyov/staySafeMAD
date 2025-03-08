@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { updateActivity } from "../../api/activityApi";
+import Button from "../../components/UI/Button";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const ModifyTripScreen = () => {
   const navigation = useNavigation();
@@ -69,9 +71,12 @@ const ModifyTripScreen = () => {
         onChangeText={setArriveTime}
       />
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Update</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <Button onPress={handleSubmit} style={styles.saveButton}>
+          <Icon name="pencil" size={14} style={styles.plusIcon} />
+          Update
+        </Button>
+      </View>
     </View>
   );
 };
@@ -103,18 +108,14 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: "#f97316",
-    padding: 16,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 10,
-    width: "50%",
-    alignSelf: "center",
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
+
+  buttonContainer: {
+    alignItems: "center",
+  },
+  plusIcon: {
+    color: "white",
+    marginRight: 6,
   },
 });
 

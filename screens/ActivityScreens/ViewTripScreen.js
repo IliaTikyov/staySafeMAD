@@ -2,6 +2,8 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { deleteActivity } from "../../api/activityApi";
+import Button from "../../components/UI/Button";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const ViewTripScreen = () => {
   const route = useRoute();
@@ -70,22 +72,17 @@ const ViewTripScreen = () => {
         <Text style={styles.valueText}>{activity.ActivityStatusName}</Text>
       </View>
 
+      {/* ✅ Buttons in a row with FontAwesome icons */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.button, styles.modifyButton]}
-          activeOpacity={0.8}
-          onPress={goToModifyScreen}
-        >
-          <Text style={styles.buttonText}>Modify</Text>
-        </TouchableOpacity>
+        <Button onPress={goToModifyScreen} style={styles.modifyButton}>
+          <Icon name="pencil" size={16} color="white" style={styles.icon} />
+          Modify
+        </Button>
 
-        <TouchableOpacity
-          style={[styles.button, styles.deleteButton]}
-          activeOpacity={0.8}
-          onPress={handleDelete}
-        >
-          <Text style={styles.buttonText}>Delete</Text>
-        </TouchableOpacity>
+        <Button onPress={handleDelete} style={styles.deleteButton}>
+          <Icon name="trash" size={16} color="white" style={styles.icon} />
+          Delete
+        </Button>
       </View>
     </View>
   );
@@ -126,27 +123,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    width: "100%",
-    marginTop: 25,
-  },
-  button: {
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    marginHorizontal: 20,
+    flexDirection: "row", // ✅ Puts buttons in a row
+    justifyContent: "space-between", // ✅ Adds spacing between buttons
+    marginTop: 20,
   },
   modifyButton: {
     backgroundColor: "#f97316",
+    flex: 1, // ✅ Allows buttons to take equal width
+    marginRight: 8, // ✅ Adds spacing between buttons
+    flexDirection: "row", // ✅ Aligns icon with text
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
   },
   deleteButton: {
     backgroundColor: "#ef4444",
+    flex: 1,
+    flexDirection: "row", // ✅ Aligns icon with text
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+  icon: {
+    marginRight: 6, // ✅ Adds space between icon and text
   },
 });
 

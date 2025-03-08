@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
 import { createActivity } from "../../api/activityApi";
+import Button from "../../components/UI/Button";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const AddTripScreen = ({ navigation }) => {
   const [tripName, setTripName] = useState("");
@@ -89,7 +91,12 @@ const AddTripScreen = ({ navigation }) => {
         placeholder="2025-03-10 14:00"
       />
 
-      <Button title="Save Trip" onPress={handleSave} />
+      <View style={styles.buttonContainer}>
+        <Button onPress={handleSave}>
+          <Icon name="plus" size={14} style={styles.plusIcon} />
+          Add Activity (Trips)
+        </Button>
+      </View>
     </View>
   );
 };
@@ -111,6 +118,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
+  },
+  buttonContainer: {
+    alignItems: "center",
+  },
+  plusIcon: {
+    color: "white",
+    marginRight: 6,
   },
 });
 
