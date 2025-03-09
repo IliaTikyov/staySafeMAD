@@ -92,25 +92,9 @@ const styles = StyleSheet.create({
   buttonContainer: {
     alignItems: "center",
   },
-  addButton: {
-    backgroundColor: "#42a5f5",
-    padding: 16,
-    borderRadius: 8,
-    marginHorizontal: 16,
-    marginTop: 10,
-    alignItems: "flex-end",
-    justifyContent: "flex-end",
-  },
   plusIcon: {
     color: "white",
     marginRight: 6,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-    fontSize: 16,
-    marginLeft: 6,
   },
   tripText: {
     fontSize: 16,

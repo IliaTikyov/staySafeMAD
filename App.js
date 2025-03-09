@@ -9,6 +9,8 @@ import ModifyTripScreen from "./screens/ActivityScreens/ModifyTripScreen";
 import ViewTripScreen from "./screens/ActivityScreens/ViewTripScreen";
 import HomeScreen from "./screens/HomeScreen";
 import StatusScreen from "./screens/StatusScreen/StatusScreen";
+import PositionScreen from "./screens/PositionScreen/PositionScreen";
+
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -29,6 +31,11 @@ const App = () => {
           name="StatusScreen"
           component={StatusScreen}
           options={{ title: "Status" }}
+        />
+        <Stack.Screen
+          name="PositionScreen"
+          component={PositionScreen}
+          options={{ title: "Live Location" }}
         />
         <Stack.Screen
           name="HomeScreen"

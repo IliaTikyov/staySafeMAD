@@ -17,6 +17,10 @@ const HomeScreen = () => {
       <Button onPress={() => navigation.navigate("StatusScreen")}>
         Status
       </Button>
+
+      <Button onPress={() => navigation.navigate("PositionScreen")}>
+        Live Location
+      </Button>
     </View>
   );
 };

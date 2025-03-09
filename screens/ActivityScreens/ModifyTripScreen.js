@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { View, Text, StyleSheet, TextInput } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { updateActivity } from "../../api/activityApi";
 import Button from "../../components/UI/Button";

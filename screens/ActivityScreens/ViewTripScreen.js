@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { deleteActivity } from "../../api/activityApi";
 import Button from "../../components/UI/Button";
@@ -72,7 +72,6 @@ const ViewTripScreen = () => {
         <Text style={styles.valueText}>{activity.ActivityStatusName}</Text>
       </View>
 
-      {/* ✅ Buttons in a row with FontAwesome icons */}
       <View style={styles.buttonContainer}>
         <Button onPress={goToModifyScreen} style={styles.modifyButton}>
           <Icon name="pencil" size={16} color="white" style={styles.icon} />
@@ -123,15 +122,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonContainer: {
-    flexDirection: "row", // ✅ Puts buttons in a row
-    justifyContent: "space-between", // ✅ Adds spacing between buttons
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 20,
   },
   modifyButton: {
     backgroundColor: "#f97316",
-    flex: 1, // ✅ Allows buttons to take equal width
-    marginRight: 8, // ✅ Adds spacing between buttons
-    flexDirection: "row", // ✅ Aligns icon with text
+    flex: 1,
+    marginRight: 8,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 10,
@@ -139,13 +138,13 @@ const styles = StyleSheet.create({
   deleteButton: {
     backgroundColor: "#ef4444",
     flex: 1,
-    flexDirection: "row", // ✅ Aligns icon with text
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 10,
   },
   icon: {
-    marginRight: 6, // ✅ Adds space between icon and text
+    marginRight: 6,
   },
 });
 
