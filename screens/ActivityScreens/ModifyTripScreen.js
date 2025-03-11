@@ -67,7 +67,7 @@ const ModifyTripScreen = () => {
       <View style={styles.buttonContainer}>
         <Button onPress={handleSubmit} style={styles.saveButton}>
           <Icon name="pencil" size={14} style={styles.plusIcon} />
-          Update
+          <Text> Update</Text>
         </Button>
       </View>
     </View>

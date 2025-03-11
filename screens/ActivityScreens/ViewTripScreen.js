@@ -75,12 +75,12 @@ const ViewTripScreen = () => {
       <View style={styles.buttonContainer}>
         <Button onPress={goToModifyScreen} style={styles.modifyButton}>
           <Icon name="pencil" size={16} color="white" style={styles.icon} />
-          Modify
+          <Text> Modify</Text>
         </Button>
 
         <Button onPress={handleDelete} style={styles.deleteButton}>
           <Icon name="trash" size={16} color="white" style={styles.icon} />
-          Delete
+          <Text> Delete </Text>
         </Button>
       </View>
     </View>

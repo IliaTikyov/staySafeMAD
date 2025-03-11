@@ -94,7 +94,7 @@ const AddTripScreen = ({ navigation }) => {
       <View style={styles.buttonContainer}>
         <Button onPress={handleSave}>
           <Icon name="plus" size={14} style={styles.plusIcon} />
-          Add Activity (Trips)
+          <Text> Add Activity (Trips) </Text>
         </Button>
       </View>
     </View>
