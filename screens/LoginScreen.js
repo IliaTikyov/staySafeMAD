@@ -10,35 +10,34 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { loginUser } from "../api/userApi";
 
 const LoginScreen = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
-  const LoginInfo = {
-    email: "ilia@gmail.com",
-    password: "ilia123",
-  };
-
-  const handleSubmit = () => {
-    if (
-      email.toLowerCase() === LoginInfo.email &&
-      password.toLowerCase() === LoginInfo.password
-    ) {
-      setLoading(true);
-
-      setTimeout(() => {
-        setLoading(false);
-        navigation.navigate("HomeScreen");
-      }, 2000);
-    } else {
-      Alert.alert("You have entered a wrong email or password");
+  const handleLogin = async () => {
+    if (!username || !password) {
+      Alert.alert("Error", "Please enter both username and password.");
+      return;
     }
 
-    setEmail("");
-    setPassword("");
+    setLoading(true);
+
+    try {
+      const user = await loginUser(username, password);
+      setLoading(false);
+
+      if (user) {
+        Alert.alert("Success", `Welcome ${user.UserFirstname}!`);
+        navigation.navigate("HomeScreen");
+      }
+    } catch (error) {
+      setLoading(false);
+      Alert.alert("Login Failed", error.message);
+    }
   };
 
   return (
@@ -58,16 +57,15 @@ const LoginScreen = () => {
             source={require("../Images/StaySafeLogo.png")}
             style={styles.logo}
           />
-          <Text style={styles.title}>Login Page</Text>
+          <Text style={styles.title}>Login</Text>
 
           <View style={styles.inputView}>
             <TextInput
               style={styles.inputText}
-              placeholder="Enter your email"
+              placeholder="Username"
               placeholderTextColor="#A9A9A9"
-              value={email}
-              onChangeText={(text) => setEmail(text)}
-              keyboardType="email-address"
+              value={username}
+              onChangeText={setUsername}
             />
           </View>
 
@@ -75,16 +73,16 @@ const LoginScreen = () => {
             <TextInput
               style={styles.inputText}
               secureTextEntry
-              placeholder="Enter your password"
+              placeholder="Password"
               placeholderTextColor="#A9A9A9"
               value={password}
-              onChangeText={(text) => setPassword(text)}
+              onChangeText={setPassword}
             />
           </View>
 
           <TouchableOpacity
             style={styles.buttonContainer}
-            onPress={handleSubmit}
+            onPress={handleLogin}
           >
             <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
@@ -93,6 +91,12 @@ const LoginScreen = () => {
     </View>
   );
 };
+
+/*
+          <TouchableOpacity onPress={() => navigation.navigate("SignupScreen")}>
+            <Text style={styles.linkText}>First time? Sign up here</Text>
+          </TouchableOpacity>
+         */
 
 const styles = StyleSheet.create({
   container: {
@@ -109,6 +113,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     marginBottom: 30,
+
     fontWeight: "bold",
     color: "black",
   },
@@ -138,6 +143,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+  // linkText: { color: "#00AEEF", fontSize: 16, marginTop: 10 },
   text: {
     fontSize: 20,
     fontWeight: "bold",
