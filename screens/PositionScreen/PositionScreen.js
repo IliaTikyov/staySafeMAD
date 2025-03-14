@@ -8,6 +8,8 @@ const PositionScreen = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let locationSubscription;
+
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -22,7 +24,24 @@ const PositionScreen = () => {
       let userLocation = await Location.getCurrentPositionAsync({});
       setLocation(userLocation.coords);
       setLoading(false);
+
+      locationSubscription = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 2000,
+          distanceInterval: 5,
+        },
+        (newLocation) => {
+          setLocation(newLocation.coords);
+        }
+      );
     })();
+
+    return () => {
+      if (locationSubscription) {
+        locationSubscription.remove();
+      }
+    };
   }, []);
 
   return (
@@ -32,7 +51,7 @@ const PositionScreen = () => {
       ) : (
         <MapView
           style={styles.map}
-          initialRegion={{
+          region={{
             latitude: location.latitude,
             longitude: location.longitude,
             latitudeDelta: 0.01,
@@ -46,7 +65,7 @@ const PositionScreen = () => {
                 longitude: location.longitude,
               }}
               title="Your Location"
-              description="You are here!"
+              description="You are moving!"
             />
           )}
         </MapView>
