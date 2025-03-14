@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "white",
   },
   label: {
     fontSize: 14,
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#cccccc",
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
