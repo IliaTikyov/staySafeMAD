@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Button from "../components/UI/Button";
 
@@ -19,7 +19,7 @@ const HomeScreen = () => {
       </Button>
 
       <Button onPress={() => navigation.navigate("PositionScreen")}>
-        Live Location
+        Live Position
       </Button>
     </View>
   );
