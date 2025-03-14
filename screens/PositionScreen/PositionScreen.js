@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, ActivityIndicator, Alert } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, Polyline } from "react-native-maps";
 import * as Location from "expo-location";
 
 const PositionScreen = () => {
   const [location, setLocation] = useState(null);
+  const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,6 +24,7 @@ const PositionScreen = () => {
 
       let userLocation = await Location.getCurrentPositionAsync({});
       setLocation(userLocation.coords);
+      setRouteCoordinates((prevCoords) => [...prevCoords, userLocation.coords]);
       setLoading(false);
 
       locationSubscription = await Location.watchPositionAsync(
@@ -32,13 +34,20 @@ const PositionScreen = () => {
           distanceInterval: 5,
         },
         (newLocation) => {
+          console.log("Updated Location:", newLocation.coords);
           setLocation(newLocation.coords);
+
+          setRouteCoordinates((prevCoords) => [
+            ...prevCoords,
+            newLocation.coords,
+          ]);
         }
       );
     })();
 
     return () => {
       if (locationSubscription) {
+        console.log("Stopped tracking location.");
         locationSubscription.remove();
       }
     };
@@ -68,6 +77,12 @@ const PositionScreen = () => {
               description="You are moving!"
             />
           )}
+
+          <Polyline
+            coordinates={routeCoordinates}
+            strokeWidth={5}
+            strokeColor="#42a5f5"
+          />
         </MapView>
       )}
     </View>
