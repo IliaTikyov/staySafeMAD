@@ -19,7 +19,10 @@ const LoginScreen = () => {
   const navigation = useNavigation();
 
   const handleLogin = async () => {
-    if (!username || !password) {
+    const lowUsername = username.trim().toLowerCase();
+    const lowPassword = password.trim().toLowerCase();
+
+    if (!lowUsername || !lowPassword) {
       Alert.alert("Error", "Please enter both username and password.");
       return;
     }
@@ -27,11 +30,10 @@ const LoginScreen = () => {
     setLoading(true);
 
     try {
-      const user = await loginUser(username, password);
+      const user = await loginUser(lowUsername, lowPassword);
       setLoading(false);
 
       if (user) {
-        Alert.alert("Success", `Welcome ${user.UserFirstname}!`);
         navigation.navigate("HomeScreen");
       }
     } catch (error) {
@@ -92,12 +94,6 @@ const LoginScreen = () => {
   );
 };
 
-/*
-          <TouchableOpacity onPress={() => navigation.navigate("SignupScreen")}>
-            <Text style={styles.linkText}>First time? Sign up here</Text>
-          </TouchableOpacity>
-         */
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -143,7 +139,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  // linkText: { color: "#00AEEF", fontSize: 16, marginTop: 10 },
   text: {
     fontSize: 20,
     fontWeight: "bold",
