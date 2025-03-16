@@ -1,14 +1,12 @@
 //!!!!!!!!!!!!!!!!!!!!!!!!!!Warning!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!Replace it with your ipv4 address!!!!!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!If http://localhost:5000/staysafe/v1/api is not working!!!!!!!!!!!!!!!!!!!!!!!
 
 //!!!!!!!!!!!!!!!!!!!!!Replace it with your ipv4 address!!!!!!!!!!!!!!!!!!!!!!!! muhammad's home ipv4 address '192.168.0.95' !!!
-const API_BASE_URL = "http://192.168.0.95:5000/staysafe/v1/api"; // Muhammad's home ipv4 address
+//const API_BASE_URL = "http://192.168.0.95:5000/staysafe/v1/api"; // Muhammad's home ipv4 address
 
 //!!!!!!!!!!!!!!!!!!!!!Replace it with your ipv4 address!!!!!!!!!!!!!!!!!!!!!!!!
-
-//const API_BASE_URL = "http://192.168.1.233:5000/staysafe/v1/api"; // Ilia's home ipv4 address
-
-//!!!!!!!!!!!!!!!!!!!!!Replace it with your ipv4 address!!!!!!!!!!!!!!!!!!!!!!!!
+const API_BASE_URL = "http://192.168.1.233:5000/staysafe/v1/api";
 
 export const apiRequest = async (endpoint, method = "GET", body = null) => {
   try {
@@ -19,6 +17,7 @@ export const apiRequest = async (endpoint, method = "GET", body = null) => {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        Authorization: `Bearer ${global.authToken || ""}`, // Add this if authentication is required
       },
     };
 
@@ -29,7 +28,10 @@ export const apiRequest = async (endpoint, method = "GET", body = null) => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(
+        `HTTP Error ${response.status}: ${errorData.message || "Unknown error"}`
+      );
     }
 
     if (method === "DELETE" || response.status === 204) {

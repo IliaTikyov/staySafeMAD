@@ -9,8 +9,7 @@ export const getActivityById = async (activityId) => {
 };
 
 export const createActivity = async (activityData) => {
-  const requestData = { ActivityID: null, ...activityData };
-  return await apiRequest("/activities", "POST", requestData);
+  return await apiRequest("/activities", "POST", activityData);
 };
 
 export const updateActivity = async (activityData) => {
