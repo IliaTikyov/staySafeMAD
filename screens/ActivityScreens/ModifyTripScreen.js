@@ -42,7 +42,10 @@ const ModifyTripScreen = () => {
       arriveTime,
       status,
     });
-    navigation.navigate("View", { activity: updateInfo, refresh: true });
+    navigation.navigate("ActivityScreen", {
+      activity: updateInfo,
+      refresh: true,
+    });
   };
 
   return (
@@ -123,11 +126,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   picker: {
-    borderWidth: 5,
-    borderColor: "#ccc",
+    borderWidth: 1,
+    borderColor: "#cccccc",
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
+    backgroundColor: "#f8f9fa",
   },
   saveButton: {
     backgroundColor: "#f97316",
