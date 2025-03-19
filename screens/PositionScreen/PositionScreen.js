@@ -7,25 +7,28 @@ import {
   TouchableOpacity,
   Text,
 } from "react-native";
-import MapView, { Marker, Polyline } from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import MapViewDirections from "react-native-maps-directions";
 import { apiRequest } from "../../api/apiClient";
+import "react-native-get-random-values";
+
+const GOOGLE_MAPS_API_KEY = "AIzaSyBuXLenUPKx4dA9Ohw6uuM98CUMc1Z3R6s";
 
 const PositionScreen = () => {
   const [location, setLocation] = useState(null);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [startLocation, setStartLocation] = useState(null);
-  const [destination, setDestination] = useState({
-    latitude: 51.3714386, // This value is a dummy data replace to observe the alert message if the user is off road
-    longitude: -0.109984, // This value is a dummy data replace to observe the alert message if the user is off road
-  });
+  const [destination, setDestination] = useState(null);
 
   useEffect(() => {
     let locationSubscription;
+    let intervalId;
 
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
           "Permission Denied",
@@ -35,84 +38,78 @@ const PositionScreen = () => {
         return;
       }
 
-      let userLocation = await Location.getCurrentPositionAsync({});
+      const userLocation = await Location.getCurrentPositionAsync({});
       setLocation(userLocation.coords);
-      setStartLocation(userLocation.coords);
       setRouteCoordinates([userLocation.coords]);
       setLoading(false);
-
       sendLocationToAPI(userLocation.coords);
 
       locationSubscription = await Location.watchPositionAsync(
         {
           accuracy: Location.Accuracy.High,
           timeInterval: 2000,
-          distanceInterval: 5,
+          distanceInterval: 10,
         },
         (newLocation) => {
-          console.log("Updated Location:", newLocation.coords);
           setLocation(newLocation.coords);
-
           setRouteCoordinates((prevCoords) => [
             ...prevCoords,
             newLocation.coords,
           ]);
-
           sendLocationToAPI(newLocation.coords);
-
           checkRouteDeviation(newLocation.coords);
         }
       );
+
+      intervalId = setInterval(async () => {
+        const currentLocation = await Location.getCurrentPositionAsync({});
+        sendLocationToAPI(currentLocation.coords);
+      }, 300000);
     })();
 
     return () => {
-      if (locationSubscription) {
-        console.log("Stopped tracking location.");
-        locationSubscription.remove();
-      }
+      locationSubscription?.remove();
+      clearInterval(intervalId);
     };
   }, []);
 
-  let lastSavedLocation = null;
-  let lastSavedTime = 0;
-
   const sendLocationToAPI = async (coords) => {
     try {
-      const currentTime = Date.now() / 1000;
-
-      if (lastSavedLocation && getDistance(lastSavedLocation, coords) < 50) {
-        return;
-      }
-
-      if (currentTime - lastSavedTime < 120) {
-        return;
-      }
-
       const body = {
         PositionActivityID: 23,
         PositionLatitude: coords.latitude,
         PositionLongitude: coords.longitude,
-        PositionTimestamp: Math.floor(currentTime),
+        PositionTimestamp: Math.floor(Date.now() / 1000),
       };
 
       const response = await apiRequest("/positions", "POST", body);
-
       console.log("Location sent to API successfully:", response);
-
-      lastSavedLocation = coords;
-      lastSavedTime = currentTime;
     } catch (error) {
       console.error("Error sending location:", error);
     }
   };
 
-  const getDistance = (location1, location2) => {
+  const checkRouteDeviation = (currentCoords) => {
+    if (!destination || !routeCoordinates.length) return;
+
+    const deviationThreshold = 50;
+
+    let isOnRoute = routeCoordinates.some((waypoint) => {
+      return getDistance(currentCoords, waypoint) < deviationThreshold;
+    });
+
+    if (!isOnRoute) {
+      Alert.alert("Warning!", "You are off your planned route!");
+      console.log("Deviation detected! Alert triggered.");
+    }
+  };
+
+  const getDistance = (point1, point2) => {
     const R = 6371000;
-    const lat1 = (location1.latitude * Math.PI) / 180;
-    const lat2 = (location2.latitude * Math.PI) / 180;
+    const lat1 = (point1.latitude * Math.PI) / 180;
+    const lat2 = (point2.latitude * Math.PI) / 180;
     const deltaLat = lat2 - lat1;
-    const deltaLon =
-      ((location2.longitude - location1.longitude) * Math.PI) / 180;
+    const deltaLon = ((point2.longitude - point1.longitude) * Math.PI) / 180;
 
     const a =
       Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
@@ -121,20 +118,8 @@ const PositionScreen = () => {
         Math.sin(deltaLon / 2) *
         Math.sin(deltaLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
     return R * c;
-  };
-
-  const checkRouteDeviation = (currentCoords) => {
-    const deviationThreshold = 0.005;
-
-    const distance = Math.sqrt(
-      Math.pow(currentCoords.latitude - destination.latitude, 2) +
-        Math.pow(currentCoords.longitude - destination.longitude, 2)
-    );
-
-    if (distance > deviationThreshold) {
-      Alert.alert("Warning!", "You are off your planned route!");
-    }
   };
 
   const triggerEmergencyAlert = () => {
@@ -151,6 +136,29 @@ const PositionScreen = () => {
         <ActivityIndicator size="large" color="#42a5f5" style={styles.loader} />
       ) : (
         <>
+          <GooglePlacesAutocomplete
+            placeholder="Enter Destination"
+            minLength={2}
+            fetchDetails={true}
+            onPress={(data, details = null) => {
+              if (details) {
+                console.log("Selected Destination:", details.geometry.location);
+                setDestination({
+                  latitude: details.geometry.location.lat,
+                  longitude: details.geometry.location.lng,
+                });
+              }
+            }}
+            query={{
+              key: GOOGLE_MAPS_API_KEY,
+              language: "en",
+            }}
+            styles={{
+              container: { flex: 0 },
+              textInput: { height: 40, color: "#000", fontSize: 16 },
+            }}
+          />
+
           <MapView
             style={styles.map}
             region={{
@@ -159,45 +167,31 @@ const PositionScreen = () => {
               latitudeDelta: 0.01,
               longitudeDelta: 0.01,
             }}
+            showsUserLocation={true}
           >
-            {location && (
-              <Marker
-                coordinate={{
-                  latitude: location.latitude,
-                  longitude: location.longitude,
-                }}
-                title="Your Location"
-                description="You are moving!"
-              />
-            )}
-
-            {startLocation && (
-              <Marker
-                coordinate={{
-                  latitude: startLocation.latitude,
-                  longitude: startLocation.longitude,
-                }}
-                pinColor="green"
-                title="Start Point"
-              />
-            )}
-
+            {location && <Marker coordinate={location} title="Your Location" />}
             {destination && (
               <Marker
-                coordinate={{
-                  latitude: destination.latitude,
-                  longitude: destination.longitude,
-                }}
-                pinColor="red"
+                coordinate={destination}
+                pinColor="blue"
                 title="Destination"
               />
             )}
-
-            <Polyline
-              coordinates={routeCoordinates}
-              strokeWidth={5}
-              strokeColor="#42a5f5"
-            />
+            {destination && (
+              <MapViewDirections
+                origin={location}
+                destination={destination}
+                apikey={GOOGLE_MAPS_API_KEY}
+                strokeWidth={5}
+                strokeColor="blue"
+                optimizeWaypoints={true}
+                onReady={(result) => {
+                  console.log("Route loaded!", result.coordinates);
+                  setRouteCoordinates(result.coordinates);
+                }}
+                onError={(error) => console.log("Directions API Error:", error)}
+              />
+            )}
           </MapView>
 
           <TouchableOpacity
@@ -233,10 +227,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 50,
     right: 20,
-    backgroundColor: "red",
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 50,
     elevation: 5,
   },
   panicText: {
