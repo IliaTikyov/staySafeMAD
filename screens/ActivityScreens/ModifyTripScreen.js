@@ -4,6 +4,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { updateActivity } from "../../api/activityApi";
 import Button from "../../components/UI/Button";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { Picker } from "@react-native-picker/picker";
 
 const ModifyTripScreen = () => {
   const navigation = useNavigation();
@@ -14,6 +15,15 @@ const ModifyTripScreen = () => {
   const [description, setDescription] = useState(activity.ActivityDescription);
   const [leaveTime, setLeaveTime] = useState(activity.ActivityLeave);
   const [arriveTime, setArriveTime] = useState(activity.ActivityArrive);
+  const [status, setStatus] = useState(activity.ActivityStatusID);
+
+  const statusOptions = [
+    { id: 1, label: "Planned" },
+    { id: 2, label: "Started" },
+    { id: 3, label: "Paused" },
+    { id: 4, label: "Cancelled" },
+    { id: 5, label: "Completed" },
+  ];
 
   const handleSubmit = async () => {
     const updateInfo = {
@@ -22,6 +32,7 @@ const ModifyTripScreen = () => {
       ActivityDescription: description,
       ActivityLeave: leaveTime,
       ActivityArrive: arriveTime,
+      ActivityStatusID: status,
     };
     await updateActivity(updateInfo);
     console.log("Updated Trip Data:", {
@@ -29,6 +40,7 @@ const ModifyTripScreen = () => {
       description,
       leaveTime,
       arriveTime,
+      status,
     });
     navigation.navigate("View", { activity: updateInfo, refresh: true });
   };
@@ -37,32 +49,44 @@ const ModifyTripScreen = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Modify Trip</Text>
 
-      <Text style={styles.label}>Trip Name (Activity Name)</Text>
+      <Text style={styles.label}>Trip Name</Text>
       <TextInput
         style={styles.input}
         value={tripName}
         onChangeText={setTripName}
       />
 
-      <Text style={styles.label}> Description </Text>
+      <Text style={styles.label}>Description</Text>
       <TextInput
         style={styles.input}
         value={description}
         onChangeText={setDescription}
       />
 
-      <Text style={styles.label}>Leave Time (YYYY-MM-DD HH:MM):</Text>
+      <Text style={styles.label}>Leave Time (YYYY-MM-DD HH:MM)</Text>
       <TextInput
         style={styles.input}
         value={leaveTime}
         onChangeText={setLeaveTime}
       />
-      <Text style={styles.label}>Arrive Time (YYYY-MM-DD HH:MM):</Text>
+
+      <Text style={styles.label}>Arrive Time (YYYY-MM-DD HH:MM)</Text>
       <TextInput
         style={styles.input}
         value={arriveTime}
         onChangeText={setArriveTime}
       />
+
+      <Text style={styles.label}>Status</Text>
+      <Picker
+        selectedValue={status}
+        onValueChange={(itemValue) => setStatus(itemValue)}
+        style={styles.picker}
+      >
+        {statusOptions.map((option) => (
+          <Picker.Item key={option.id} label={option.label} value={option.id} />
+        ))}
+      </Picker>
 
       <View style={styles.buttonContainer}>
         <Button onPress={handleSubmit} style={styles.saveButton}>
@@ -85,7 +109,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-    alignSelf: "center",
   },
   label: {
     fontSize: 14,
@@ -99,10 +122,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
   },
+  picker: {
+    borderWidth: 5,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
   saveButton: {
     backgroundColor: "#f97316",
   },
-
   buttonContainer: {
     alignItems: "center",
   },

@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
 import { createActivity } from "../../api/activityApi";
 import Button from "../../components/UI/Button";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { Picker } from "@react-native-picker/picker";
 
 const AddTripScreen = ({ navigation }) => {
   const [tripName, setTripName] = useState("");
@@ -12,6 +13,14 @@ const AddTripScreen = ({ navigation }) => {
   const [leaveTime, setLeaveTime] = useState("");
   const [arriveTime, setArriveTime] = useState("");
   const [statusID, setStatusID] = useState("1");
+
+  const statusOptions = [
+    { id: 1, label: "Planned", color: "#3498db" },
+    { id: 2, label: "Started", color: "#f39c12" },
+    { id: 3, label: "Paused", color: "#f1c40f" },
+    { id: 4, label: "Cancelled", color: "#e74c3c" },
+    { id: 5, label: "Completed", color: "#2ecc71" },
+  ];
 
   const handleSave = async () => {
     if (!tripName || !description || !leaveTime || !arriveTime) {
@@ -91,6 +100,22 @@ const AddTripScreen = ({ navigation }) => {
         placeholder="2025-03-10 14:00"
       />
 
+      <Text style={styles.label}>Status:</Text>
+      <Picker
+        selectedValue={statusID}
+        onValueChange={(itemValue) => setStatusID(itemValue)}
+        style={[
+          styles.picker,
+          {
+            color: statusOptions.find((s) => s.id == statusID)?.color || "#000",
+          },
+        ]}
+      >
+        {statusOptions.map((option) => (
+          <Picker.Item key={option.id} label={option.label} value={option.id} />
+        ))}
+      </Picker>
+
       <View style={styles.buttonContainer}>
         <Button onPress={handleSave}>
           <Icon name="plus" size={14} style={styles.plusIcon} />
@@ -118,6 +143,14 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
+  },
+  picker: {
+    borderWidth: 1,
+    borderColor: "#cccccc",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    backgroundColor: "#f8f9fa",
   },
   buttonContainer: {
     alignItems: "center",

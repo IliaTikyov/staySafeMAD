@@ -43,6 +43,23 @@ const ActivityScreen = () => {
     }, [])
   );
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Planned":
+        return "#3498db";
+      case "Started":
+        return "#f39c12";
+      case "Paused":
+        return "#f1c40f";
+      case "Cancelled":
+        return "#e74c3c";
+      case "Completed":
+        return "#2ecc71";
+      default:
+        return "#7f8c8d";
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.buttonContainer}>
@@ -70,8 +87,7 @@ const ActivityScreen = () => {
             <Text
               style={{
                 fontWeight: "bold",
-                color:
-                  item.ActivityStatusName === "Completed" ? "green" : "orange",
+                color: getStatusColor(item.ActivityStatusName),
               }}
             >
               Status: {item.ActivityStatusName}

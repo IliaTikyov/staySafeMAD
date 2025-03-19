@@ -38,6 +38,23 @@ const ViewTripScreen = () => {
     );
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Planned":
+        return "#3498db";
+      case "Started":
+        return "#f39c12";
+      case "Paused":
+        return "#f1c40f";
+      case "Cancelled":
+        return "#e74c3c";
+      case "Completed":
+        return "#2ecc71";
+      default:
+        return "#7f8c8d";
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{activity.ActivityName}</Text>
@@ -69,7 +86,17 @@ const ViewTripScreen = () => {
 
       <View style={styles.detailRow}>
         <Text style={styles.label}>Status:</Text>
-        <Text style={styles.valueText}>{activity.ActivityStatusName}</Text>
+        <Text
+          style={[
+            styles.valueText,
+            {
+              fontWeight: "bold",
+              color: getStatusColor(activity.ActivityStatusName),
+            },
+          ]}
+        >
+          {activity.ActivityStatusName}
+        </Text>
       </View>
 
       <View style={styles.buttonContainer}>
