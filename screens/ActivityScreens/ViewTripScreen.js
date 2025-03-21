@@ -320,6 +320,7 @@ const ViewTripScreen = () => {
 
   useEffect(() => {
     // Hardcoded: London Eye to Big Ben
+    // TEST PURPOSES ONLY - WILL BE REPLACED WITH THE ACTUAL DATA FROM THE API LATER (hopefully :<   )
     const hardcodedFrom = {
       latitude: 51.5033,
       longitude: -0.1195,
