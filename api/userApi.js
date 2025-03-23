@@ -38,3 +38,20 @@ export const updateUserLocation = async (userId, latitude, longitude) => {
     UserTimestamp: Date.now(),
   });
 };
+
+export const getUsers = async () => {
+  return await apiRequest("/users");
+};
+
+export const createUser = async (userData) => {
+  return await apiRequest("/users", "POST", userData);
+};
+
+export const updateUser = async (userData) => {
+  const { UserID, ...updatedFields } = userData;
+  return await apiRequest(`/users/${UserID}`, "PUT", updatedFields);
+};
+
+export const deleteUser = async (userID) => {
+  return await apiRequest(`/users/${userID}`, "DELETE");
+};
