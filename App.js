@@ -10,6 +10,8 @@ import ViewTripScreen from "./screens/ActivityScreens/ViewTripScreen";
 import HomeScreen from "./screens/HomeScreen";
 import StatusScreen from "./screens/StatusScreen/StatusScreen";
 import PositionScreen from "./screens/PositionScreen/PositionScreen";
+import ContactsScreen from "./screens/ContactScreen/Contacts";
+import UserViewScreen from "./screens/ContactScreen/UserViewScreen";
 
 const Stack = createStackNavigator();
 
@@ -36,6 +38,11 @@ const App = () => {
           name="PositionScreen"
           component={PositionScreen}
           options={{ title: "Live Location" }}
+        />
+        <Stack.Screen
+          name="ContactsScreen"
+          component={ContactsScreen}
+          options={{ title: "Contacts" }}
         />
         <Stack.Screen
           name="HomeScreen"
@@ -66,6 +73,7 @@ const App = () => {
         <Stack.Screen name="Add" component={AddTripScreen} />
         <Stack.Screen name="View" component={ViewTripScreen} />
         <Stack.Screen name="Modify" component={ModifyTripScreen} />
+        <Stack.Screen name="UserView" component={UserViewScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
