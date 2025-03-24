@@ -10,8 +10,6 @@ import {
 import { getUsers } from "../../api/userApi";
 import { getContacts } from "../../api/contactApi";
 import { useNavigation } from "@react-navigation/native";
-import Button from "../../components/UI/Button";
-import Icon from "react-native-vector-icons/FontAwesome";
 
 const ContactsScreen = () => {
   const [contacts, setContacts] = useState([]);
@@ -37,7 +35,6 @@ const ContactsScreen = () => {
             userImage: user ? user.UserImageURL : null,
             UserUsername: user?.UserUsername || null,
             UserPhone: user?.UserPhone || null,
-            // Add any other fields you might need
           };
         });
 
@@ -116,7 +113,6 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
   },
   profileImage: {
     width: 50,

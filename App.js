@@ -12,6 +12,7 @@ import StatusScreen from "./screens/StatusScreen/StatusScreen";
 import PositionScreen from "./screens/PositionScreen/PositionScreen";
 import ContactsScreen from "./screens/ContactScreen/Contacts";
 import UserViewScreen from "./screens/ContactScreen/UserViewScreen";
+import LocationScreen from "./screens/LocationScreen/LocationScreen";
 
 const Stack = createStackNavigator();
 
@@ -43,6 +44,11 @@ const App = () => {
           name="ContactsScreen"
           component={ContactsScreen}
           options={{ title: "Contacts" }}
+        />
+        <Stack.Screen
+          name="LocationScreen"
+          component={LocationScreen}
+          options={{ title: "Location" }}
         />
         <Stack.Screen
           name="HomeScreen"

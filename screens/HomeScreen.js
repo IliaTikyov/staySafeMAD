@@ -21,6 +21,10 @@ const HomeScreen = () => {
       <Button onPress={() => navigation.navigate("ContactsScreen")}>
         Contacts
       </Button>
+
+      <Button onPress={() => navigation.navigate("LocationScreen")}>
+        LocationScreen
+      </Button>
     </View>
   );
 };
