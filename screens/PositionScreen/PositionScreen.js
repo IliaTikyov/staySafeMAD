@@ -13,6 +13,7 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import MapViewDirections from "react-native-maps-directions";
 import { apiRequest } from "../../api/apiClient";
 import "react-native-get-random-values";
+import { createActivity } from "../../api/activityApi";
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyBuXLenUPKx4dA9Ohw6uuM98CUMc1Z3R6s";
 
@@ -122,12 +123,42 @@ const PositionScreen = () => {
     return R * c;
   };
 
-  const triggerEmergencyAlert = () => {
-    Alert.alert(
-      "Emergency Alert!",
-      "Your emergency contacts have been notified with your location.",
-      [{ text: "OK" }]
-    );
+  const triggerEmergencyAlert = async () => {
+    try {
+      const now = new Date().toISOString();
+
+      //This data  needs to be replaced later. Right now it hardcoded for testing purposes.
+      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      const alertActivity = {
+        ActivityID: 1,
+        ActivityName: "EMERGENCY ALERT",
+        ActivityUserID: 1,
+        ActivityDescription: "User triggered emergency alert via panic button.",
+        ActivityFromID: 10,
+        ActivityLeave: now,
+        ActivityToID: 8,
+        ActivityArrive: now,
+        ActivityStatusID: 5,
+
+        ActivityUsername: "aishaahmed",
+        ActivityFromName: "Current Location",
+        ActivityToName: "Unknown / Emergency",
+        ActivityStatusName: "Completed",
+      };
+
+      const response = await createActivity(alertActivity);
+
+      console.log("Emergency activity logged:", response);
+
+      Alert.alert(
+        "Emergency Alert Sent",
+        "An emergency alert has been logged.",
+        [{ text: "OK" }]
+      );
+    } catch (err) {
+      console.error("Failed to log alert:", err);
+      Alert.alert("Error", "Could not send alert.");
+    }
   };
 
   return (
