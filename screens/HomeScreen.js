@@ -14,12 +14,16 @@ const HomeScreen = () => {
         Activities (Trips)
       </Button>
 
-      <Button onPress={() => navigation.navigate("StatusScreen")}>
-        Status
-      </Button>
-
       <Button onPress={() => navigation.navigate("PositionScreen")}>
         Live Position
+      </Button>
+
+      <Button onPress={() => navigation.navigate("ContactsScreen")}>
+        Contacts
+      </Button>
+
+      <Button onPress={() => navigation.navigate("LocationScreen")}>
+        LocationScreen
       </Button>
     </View>
   );
