@@ -63,7 +63,7 @@ const ActivityScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.buttonContainer}>
-        <Button onPress={() => navigation.navigate("Add")}>
+        <Button onPress={() => navigation.navigate("AddLocations")}>
           <Icon name="plus" size={14} style={styles.plusIcon} />
           <Text> Add Activity (Trips)</Text>
         </Button>

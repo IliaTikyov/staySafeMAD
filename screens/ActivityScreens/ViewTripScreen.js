@@ -1,41 +1,92 @@
-import React from "react";
-import { View, Text, StyleSheet, Alert } from "react-native";
+/* import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  SafeAreaView,
+} from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
-import { deleteActivity } from "../../api/activityApi";
+import { deleteActivity, updateActivity } from "../../api/activityApi";
+import { getLocationById } from "../../api/locationApi";
+import MapView, { Marker } from "react-native-maps";
+import MapViewDirections from "react-native-maps-directions";
+import * as Location from "expo-location";
 import Button from "../../components/UI/Button";
 import Icon from "react-native-vector-icons/FontAwesome";
+
+const GOOGLE_MAPS_API_KEY = "AIzaSyCYqNe56qzLAp9T4zKAgKuEkHHigcNYc3o";
 
 const ViewTripScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { activity } = route.params;
 
-  const goToModifyScreen = () => {
-    navigation.navigate("Modify", { activity: activity });
+  const [fromCoords, setFromCoords] = useState(null);
+  const [toCoords, setToCoords] = useState(null);
+  const [userCoords, setUserCoords] = useState(null);
+  const [eta, setEta] = useState(null);
+
+  useEffect(() => {
+    const fetchLocationsAndCoords = async () => {
+      try {
+        const fromLoc = await getLocationById(activity.ActivityFromID);
+        const toLoc = await getLocationById(activity.ActivityToID);
+        setFromCoords({
+          latitude: fromLoc.LocationLatitude,
+          longitude: fromLoc.LocationLongitude,
+        });
+        setToCoords({
+          latitude: toLoc.LocationLatitude,
+          longitude: toLoc.LocationLongitude,
+        });
+
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === "granted") {
+          const loc = await Location.getCurrentPositionAsync({});
+          setUserCoords({
+            latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to load coordinates:", error);
+      }
+    };
+
+    fetchLocationsAndCoords();
+  }, []);
+
+  const changeStatus = async (newStatusID) => {
+    try {
+      const updated = { ...activity, ActivityStatusID: newStatusID };
+      await updateActivity(updated);
+      Alert.alert("Status Updated!");
+      navigation.goBack();
+    } catch (err) {
+      Alert.alert("Failed to update status.");
+    }
   };
 
   const handleDelete = async () => {
-    Alert.alert(
-      "Confirm Deletion",
-      "Are you sure you want to delete this trip?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteActivity(activity.ActivityID);
-              Alert.alert("Success", "Trip deleted successfully!");
-              navigation.goBack();
-            } catch (error) {
-              console.error("Failed to delete trip:", error);
-              Alert.alert("Error", "Failed to delete trip.");
-            }
-          },
+    Alert.alert("Confirm Deletion", "Are you sure?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await deleteActivity(activity.ActivityID);
+            Alert.alert("Deleted");
+            navigation.goBack();
+          } catch (error) {
+            console.error("Delete error:", error);
+            Alert.alert("Failed to delete trip.");
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const getStatusColor = (status) => {
@@ -56,119 +107,341 @@ const ViewTripScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{activity.ActivityName}</Text>
-      <Text style={styles.description}>{activity.ActivityDescription}</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>{activity.ActivityName}</Text>
+        <Text style={styles.subtitle}>{activity.ActivityDescription}</Text>
 
-      <View style={styles.detailRow}>
-        <Text style={styles.label}>From:</Text>
-        <Text style={styles.valueText}>{activity.ActivityFromName}</Text>
-      </View>
+        <View style={styles.card}>
+          <Text style={styles.label}>From:</Text>
+          <Text style={styles.value}>{activity.ActivityFromName}</Text>
 
-      <View style={styles.detailRow}>
-        <Text style={styles.label}>To:</Text>
-        <Text style={styles.valueText}>{activity.ActivityToName}</Text>
-      </View>
+          <Text style={styles.label}>To:</Text>
+          <Text style={styles.value}>{activity.ActivityToName}</Text>
 
-      <View style={styles.detailRow}>
-        <Text style={styles.label}>Leave Time:</Text>
-        <Text style={styles.valueText}>
-          {new Date(activity.ActivityLeave).toLocaleString()}
-        </Text>
-      </View>
+          <Text style={styles.label}>Leave:</Text>
+          <Text style={styles.value}>
+            {new Date(activity.ActivityLeave).toLocaleString()}
+          </Text>
 
-      <View style={styles.detailRow}>
-        <Text style={styles.label}>Arrival Time:</Text>
-        <Text style={styles.valueText}>
-          {new Date(activity.ActivityArrive).toLocaleString()}
-        </Text>
-      </View>
+          <Text style={styles.label}>Arrive:</Text>
+          <Text style={styles.value}>
+            {new Date(activity.ActivityArrive).toLocaleString()}
+          </Text>
 
-      <View style={styles.detailRow}>
-        <Text style={styles.label}>Status:</Text>
-        <Text
-          style={[
-            styles.valueText,
-            {
-              fontWeight: "bold",
-              color: getStatusColor(activity.ActivityStatusName),
-            },
-          ]}
-        >
-          {activity.ActivityStatusName}
-        </Text>
-      </View>
+          <Text
+            style={[
+              styles.status,
+              { color: getStatusColor(activity.ActivityStatusName) },
+            ]}
+          >
+            {activity.ActivityStatusName}
+          </Text>
+        </View>
 
-      <View style={styles.buttonContainer}>
-        <Button onPress={goToModifyScreen} style={styles.modifyButton}>
-          <Icon name="pencil" size={16} color="white" style={styles.icon} />
-          <Text> Modify</Text>
-        </Button>
+        {fromCoords && toCoords && (
+          <>
+            <MapView
+              style={styles.map}
+              region={{
+                latitude: fromCoords.latitude,
+                longitude: fromCoords.longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+            >
+              <Marker coordinate={fromCoords} title="Start" />
+              <Marker coordinate={toCoords} title="Destination" />
+              {userCoords && activity.ActivityStatusName === "Started" && (
+                <Marker coordinate={userCoords} title="You" pinColor="blue" />
+              )}
+              {userCoords &&
+                toCoords &&
+                userCoords.latitude &&
+                userCoords.longitude &&
+                toCoords.latitude &&
+                toCoords.longitude && (
+                  <MapViewDirections
+                    origin={{
+                      latitude: userCoords.latitude,
+                      longitude: userCoords.longitude,
+                    }}
+                    destination={{
+                      latitude: toCoords.latitude,
+                      longitude: toCoords.longitude,
+                    }}
+                    apikey={GOOGLE_MAPS_API_KEY}
+                    strokeWidth={4}
+                    strokeColor="blue"
+                    onReady={(result) => {
+                      const minutes = Math.ceil(result.duration);
+                      setEta(`${minutes} min`);
+                    }}
+                    onError={(error) => {
+                      console.warn("MapViewDirections Error:", error);
+                    }}
+                  />
+                )}
+            </MapView>
+            {eta && (
+              <View style={styles.etaContainer}>
+                <Text style={styles.etaText}>ETA: {eta}</Text>
+              </View>
+            )}
+          </>
+        )}
 
-        <Button onPress={handleDelete} style={styles.deleteButton}>
-          <Icon name="trash" size={16} color="white" style={styles.icon} />
-          <Text> Delete </Text>
-        </Button>
-      </View>
-    </View>
+        <View style={styles.buttonContainer}>
+          <Button onPress={() => changeStatus(2)} style={styles.actionButton}>
+            <Icon name="play" size={16} color="white" style={styles.icon} />
+            <Text> Start </Text>
+          </Button>
+          <Button onPress={() => changeStatus(5)} style={styles.actionButton}>
+            <Icon name="check" size={16} color="white" style={styles.icon} />
+            <Text> Complete </Text>
+          </Button>
+          <Button
+            onPress={() => navigation.navigate("Modify", { activity })}
+            style={styles.actionButton}
+          >
+            <Icon name="pencil" size={16} color="white" style={styles.icon} />
+            <Text> Modify </Text>
+          </Button>
+          <Button onPress={handleDelete} style={styles.deleteButton}>
+            <Icon name="trash" size={16} color="white" style={styles.icon} />
+            <Text> Delete </Text>
+          </Button>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: "#fff" },
   container: {
-    flex: 1,
-    padding: 32,
-    backgroundColor: "#f8f9fa",
+    padding: 20,
+    paddingBottom: 40,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-    marginTop: 16,
-  },
-  description: {
-    color: "gray",
-    fontSize: 18,
-    marginBottom: 12,
     textAlign: "center",
   },
-  detailRow: {
-    flexDirection: "row",
-    marginBottom: 8,
-    alignItems: "center",
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  card: {
+    backgroundColor: "#f1f1f1",
+    borderRadius: 12,
+    padding: 16,
+    marginVertical: 10,
+    elevation: 1,
   },
   label: {
     fontWeight: "600",
-    fontSize: 16,
-    marginRight: 4,
+    marginTop: 6,
   },
-  valueText: {
-    color: "#1D3557",
-    fontWeight: "300",
-    fontSize: 16,
+  value: {
+    marginBottom: 4,
+    color: "#333",
+  },
+  status: {
+    marginTop: 10,
+    fontWeight: "bold",
+    textAlign: "right",
+  },
+  map: {
+    width: "100%",
+    height: 300,
+    borderRadius: 10,
+    marginVertical: 12,
+  },
+  etaContainer: {
+    backgroundColor: "#e0f7fa",
+    padding: 8,
+    marginBottom: 10,
+    borderRadius: 8,
+    alignSelf: "center",
+  },
+  etaText: {
+    color: "#00796b",
+    fontWeight: "bold",
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
+    marginTop: 16,
+    gap: 10,
   },
-  modifyButton: {
-    backgroundColor: "#f97316",
-    flex: 1,
-    marginRight: 8,
+  actionButton: {
+    backgroundColor: "#00AEEF",
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 10,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginBottom: 8,
   },
   deleteButton: {
-    backgroundColor: "#ef4444",
-    flex: 1,
+    backgroundColor: "#e53935",
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 10,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  icon: {
+    marginRight: 6,
+  },
+});
+
+export default ViewTripScreen;
+*/
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  SafeAreaView,
+} from "react-native";
+import MapView, { Marker } from "react-native-maps";
+import MapViewDirections from "react-native-maps-directions";
+import Icon from "react-native-vector-icons/FontAwesome";
+import Button from "../../components/UI/Button";
+
+const GOOGLE_MAPS_API_KEY = "AIzaSyCYqNe56qzLAp9T4zKAgKuEkHHigcNYc3o"; // Replace with your key
+
+const ViewTripScreen = () => {
+  const [fromCoords, setFromCoords] = useState(null);
+  const [toCoords, setToCoords] = useState(null);
+  const [eta, setEta] = useState(null);
+
+  useEffect(() => {
+    // Hardcoded: London Eye to Big Ben
+    // TEST PURPOSES ONLY - WILL BE REPLACED WITH THE ACTUAL DATA FROM THE API LATER (hopefully :<   )
+    const hardcodedFrom = {
+      latitude: 51.5033,
+      longitude: -0.1195,
+    };
+
+    const hardcodedTo = {
+      latitude: 51.5007,
+      longitude: -0.1246,
+    };
+
+    setFromCoords(hardcodedFrom);
+    setToCoords(hardcodedTo);
+  }, []);
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Test Trip: London Eye ➜ Big Ben</Text>
+
+        {fromCoords && toCoords && (
+          <>
+            <MapView
+              style={styles.map}
+              region={{
+                latitude: fromCoords.latitude,
+                longitude: fromCoords.longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+            >
+              <Marker coordinate={fromCoords} title="From: London Eye" />
+              <Marker coordinate={toCoords} title="To: Big Ben" />
+
+              <MapViewDirections
+                origin={fromCoords}
+                destination={toCoords}
+                apikey={GOOGLE_MAPS_API_KEY}
+                strokeWidth={4}
+                strokeColor="blue"
+                onReady={(result) => {
+                  const minutes = Math.ceil(result.duration);
+                  setEta(`${minutes} min`);
+                }}
+                onError={(error) => {
+                  console.warn("MapViewDirections Error:", error);
+                }}
+              />
+            </MapView>
+
+            {eta && (
+              <View style={styles.etaContainer}>
+                <Text style={styles.etaText}>Estimated Time: {eta}</Text>
+              </View>
+            )}
+          </>
+        )}
+
+        <View style={styles.buttonContainer}>
+          <Button
+            onPress={() => Alert.alert("Panic Alert", "This is a test button")}
+            style={styles.actionButton}
+          >
+            <Icon
+              name="exclamation-triangle"
+              size={16}
+              color="white"
+              style={styles.icon}
+            />
+            <Text style={styles.buttonText}> Panic </Text>
+          </Button>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: "#fff" },
+  container: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  map: {
+    width: "100%",
+    height: 300,
+    borderRadius: 10,
+    marginBottom: 16,
+  },
+  etaContainer: {
+    backgroundColor: "#e0f7fa",
+    padding: 8,
+    borderRadius: 8,
+    alignSelf: "center",
+    marginBottom: 16,
+  },
+  etaText: {
+    color: "#00796b",
+    fontWeight: "bold",
+  },
+  buttonContainer: {
+    marginTop: 16,
+    gap: 10,
+  },
+  actionButton: {
+    backgroundColor: "#ff5252",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    marginLeft: 6,
   },
   icon: {
     marginRight: 6,
