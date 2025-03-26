@@ -89,7 +89,7 @@ const PositionScreen = () => {
   const checkRouteDeviation = (currentCoords) => {
     if (!destination || !routeCoordinates.length) return;
 
-    const deviationThreshold = 50; // meters
+    const deviationThreshold = 50; //This value is in meters (if you want you can adjust it) !!!!!!
 
     const isOnRoute = routeCoordinates.some((waypoint) => {
       return getDistance(currentCoords, waypoint) < deviationThreshold;
