@@ -208,10 +208,10 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     padding: 15,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "white",
   },
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: "white",
     padding: 15,
     borderRadius: 10,
     marginBottom: 12,
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   },
   coords: {
     fontSize: 12,
-    color: "#888",
+    color: "#007C91",
   },
   searchInput: {
     backgroundColor: "white",
