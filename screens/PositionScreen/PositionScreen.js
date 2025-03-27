@@ -15,6 +15,7 @@ import MapViewDirections from "react-native-maps-directions";
 import { apiRequest } from "../../api/apiClient";
 import "react-native-get-random-values";
 import * as SMS from "expo-sms";
+import Button from "../../components/UI/Button";
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyCYqNe56qzLAp9T4zKAgKuEkHHigcNYc3o";
 
@@ -163,9 +164,9 @@ const PositionScreen = () => {
               container: { flex: 0, zIndex: 1 },
               textInput: {
                 height: 44,
-                color: "#000",
+                color: "black",
                 fontSize: 16,
-                backgroundColor: "#fff",
+                backgroundColor: "white",
                 borderColor: "#ccc",
                 borderWidth: 1,
                 paddingHorizontal: 10,
@@ -189,7 +190,7 @@ const PositionScreen = () => {
             {destination && (
               <Marker
                 coordinate={destination}
-                pinColor="blue"
+                pinColor="#00AEEF"
                 title="Destination"
               />
             )}
@@ -211,7 +212,7 @@ const PositionScreen = () => {
                   }}
                   apikey={GOOGLE_MAPS_API_KEY}
                   strokeWidth={4}
-                  strokeColor="blue"
+                  strokeColor="#00AEEF"
                   optimizeWaypoints={true}
                   onReady={(result) => {
                     console.log("Route loaded!", result.coordinates);
@@ -233,7 +234,7 @@ const PositionScreen = () => {
                 value={phoneNumber}
                 onChangeText={setPhoneNumber}
               />
-              <TouchableOpacity
+              <Button
                 style={styles.submitButton}
                 onPress={() => {
                   if (!phoneNumber) {
@@ -248,7 +249,7 @@ const PositionScreen = () => {
                 }}
               >
                 <Text style={styles.submitText}>Send Emergency SMS</Text>
-              </TouchableOpacity>
+              </Button>
             </View>
           )}
 
@@ -313,18 +314,19 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     borderRadius: 8,
     padding: 10,
-    marginBottom: 20,
+    marginBottom: 5,
   },
   submitButton: {
-    backgroundColor: "#3498db",
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 8,
+    backgroundColor: "#00AEEF",
+    width: "100%",
+    alignSelf: "center",
+    marginBottom: 0,
   },
   submitText: {
     color: "white",
     fontWeight: "bold",
     fontSize: 16,
+    alignSelf: "center",
   },
   phonePrompt: {
     backgroundColor: "white",
