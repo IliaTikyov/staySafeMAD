@@ -80,13 +80,13 @@ const App = () => {
             ),
           })}
         />
-        <Stack.Screen name="ActivityScreen" component={ActivityScreen} />
+        <Stack.Screen name="Activity" component={ActivityScreen} />
         <Stack.Screen name="Add" component={AddTripScreen} />
         <Stack.Screen name="Modify" component={ModifyTripScreen} />
         <Stack.Screen name="View" component={ViewTripScreen} />
         <Stack.Screen name="StatusScreen" component={StatusScreen} />
         <Stack.Screen name="PositionScreen" component={PositionScreen} />
-        <Stack.Screen name="AddLocations" component={AddLocationsScreen} />
+        <Stack.Screen name="Add Locations" component={AddLocationsScreen} />
         <Stack.Screen name="ContactsScreen" component={ContactsScreen} />
         <Stack.Screen name="UserView" component={UserViewScreen} />
         <Stack.Screen name="LocationScreen" component={LocationScreen} />

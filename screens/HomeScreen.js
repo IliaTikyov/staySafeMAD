@@ -10,7 +10,7 @@ const HomeScreen = () => {
     <View style={styles.container}>
       <Text style={styles.title}>StaySafe App</Text>
 
-      <Button onPress={() => navigation.navigate("ActivityScreen")}>
+      <Button onPress={() => navigation.navigate("Activity")}>
         Activities (Trips)
       </Button>
 

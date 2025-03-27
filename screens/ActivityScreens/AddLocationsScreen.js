@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   View,
   Text,
+  LogBox,
   StyleSheet,
   Alert,
   KeyboardAvoidingView,
@@ -13,6 +14,7 @@ import Button from "../../components/UI/Button";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyCYqNe56qzLAp9T4zKAgKuEkHHigcNYc3o";
+LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
 
 const AddLocationScreen = ({ navigation }) => {
   const [fromDetails, setFromDetails] = useState(null);
@@ -59,9 +61,6 @@ const AddLocationScreen = ({ navigation }) => {
       const savedFrom = (await createLocation(fromLocation))[0];
       const savedTo = (await createLocation(toLocation))[0];
 
-      console.log("Saved From Location:", savedFrom);
-      console.log("Saved To Location:", savedTo);
-
       if (savedFrom?.LocationID && savedTo?.LocationID) {
         navigation.navigate("Add", {
           fromLocationId: savedFrom.LocationID,
@@ -87,27 +86,49 @@ const AddLocationScreen = ({ navigation }) => {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.label}>Pick From Location</Text>
-        <GooglePlacesAutocomplete
-          placeholder="From location"
-          fetchDetails={true}
-          onPress={(data, details = null) => setFromDetails(details)}
-          query={{ key: GOOGLE_MAPS_API_KEY, language: "en" }}
-          styles={{ textInput: styles.input }}
-        />
+        <Text style={styles.stepIndicator}>Step 1 of 2</Text>
+        <Text style={styles.header}>Plan Your Trip</Text>
+        <Text style={styles.description}>
+          Pick a location to start your trip{" "}
+          <Text style={{ fontWeight: "bold" }}>from</Text> and your destination{" "}
+          <Text style={{ fontWeight: "bold" }}>to</Text>.
+        </Text>
 
-        <Text style={styles.label}>Pick To Location</Text>
-        <GooglePlacesAutocomplete
-          placeholder="To location"
-          fetchDetails={true}
-          onPress={(data, details = null) => setToDetails(details)}
-          query={{ key: GOOGLE_MAPS_API_KEY, language: "en" }}
-          styles={{ textInput: styles.input }}
-        />
+        <View style={[styles.section, { zIndex: 2 }]}>
+          <Text style={styles.label}>🚩 From Location</Text>
+          <GooglePlacesAutocomplete
+            placeholder="Enter starting point"
+            fetchDetails={true}
+            onPress={(data, details = null) => setFromDetails(details)}
+            query={{ key: GOOGLE_MAPS_API_KEY, language: "en" }}
+            styles={{
+              textInput: styles.input,
+              container: styles.autocompleteContainer,
+              listView: { zIndex: 999 },
+            }}
+          />
+        </View>
 
-        <Button onPress={handleSaveLocations} style={styles.button}>
-          <Text style={styles.buttonText}>Continue to Trip Info</Text>
-        </Button>
+        <View style={[styles.section, { zIndex: 1 }]}>
+          <Text style={styles.label}>🏁 To Location</Text>
+          <GooglePlacesAutocomplete
+            placeholder="Enter destination"
+            fetchDetails={true}
+            onPress={(data, details = null) => setToDetails(details)}
+            query={{ key: GOOGLE_MAPS_API_KEY, language: "en" }}
+            styles={{
+              textInput: styles.input,
+              container: styles.autocompleteContainer,
+              listView: { zIndex: 998 },
+            }}
+          />
+        </View>
+
+        <View style={styles.buttonWrapper}>
+          <Button onPress={handleSaveLocations}>
+            <Text style={styles.buttonText}>Continue to Trip Info</Text>
+          </Button>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -116,27 +137,59 @@ const AddLocationScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#f7f9fb",
     flexGrow: 1,
+  },
+  stepIndicator: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#555",
+    textAlign: "center",
+    marginBottom: 5,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#00AEEF",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  description: {
+    fontSize: 15,
+    color: "#444",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  section: {
+    marginBottom: 30,
   },
   label: {
     fontWeight: "bold",
-    marginBottom: 5,
-    marginTop: 15,
+    marginBottom: 6,
+    fontSize: 16,
+    color: "#333",
   },
   input: {
-    borderColor: "#ccc",
-    borderWidth: 1,
+    borderColor: "#00AEEF",
+    borderWidth: 1.2,
     padding: 10,
-    borderRadius: 5,
-    marginBottom: 15,
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    fontSize: 15,
+  },
+  autocompleteContainer: {
+    flex: 1,
+  },
+  buttonWrapper: {
+    marginTop: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
   },
   buttonText: {
     color: "white",
     fontWeight: "bold",
-  },
-  button: {
-    alignSelf: "center",
+    fontSize: 16,
   },
 });
 

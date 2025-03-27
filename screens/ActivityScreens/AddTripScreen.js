@@ -1,4 +1,3 @@
-// screens/AddActivityScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -83,7 +82,7 @@ const AddTripScreen = ({ route, navigation }) => {
     try {
       await createActivity(newTrip);
       Alert.alert("Success", "Trip created successfully!");
-      navigation.navigate("ActivityScreen");
+      navigation.navigate("Activity");
     } catch (err) {
       console.error("Error creating activity:", err);
       Alert.alert("Error", "Failed to create activity. Try again.");
@@ -96,6 +95,7 @@ const AddTripScreen = ({ route, navigation }) => {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.stepIndicator}>Step 2 of 2</Text>
         <Text style={styles.label}>Trip Name</Text>
         <TextInput
           style={styles.input}
@@ -155,9 +155,26 @@ const AddTripScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#fff" },
-  container: { padding: 20, paddingBottom: 40 },
-  label: { fontSize: 14, fontWeight: "bold", marginBottom: 5 },
+  stepIndicator: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#555",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  container: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
   input: {
     borderWidth: 1,
     borderColor: "#cccccc",
@@ -165,9 +182,18 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
   },
-  picker: { backgroundColor: "#f8f9fa", marginBottom: 10 },
-  buttonContainer: { alignItems: "center", marginTop: 10 },
-  plusIcon: { color: "white", marginRight: 6 },
+  picker: {
+    backgroundColor: "#f8f9fa",
+    marginBottom: 10,
+  },
+  buttonContainer: {
+    alignItems: "center",
+    marginTop: 10,
+  },
+  plusIcon: {
+    color: "white",
+    marginRight: 6,
+  },
 });
 
 export default AddTripScreen;
