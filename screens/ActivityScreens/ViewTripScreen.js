@@ -186,7 +186,7 @@ const ViewTripScreen = () => {
               </Button>
               <Button
                 onPress={() => changeStatus(5)}
-                style={styles.actionButton}
+                style={[styles.actionButton, styles.completeButton]}
               >
                 <Icon
                   name="check"
@@ -198,7 +198,7 @@ const ViewTripScreen = () => {
               </Button>
               <Button
                 onPress={() => navigation.navigate("Modify", { activity })}
-                style={styles.actionButton}
+                style={[styles.actionButton, styles.modifyButton]}
               >
                 <Icon
                   name="pencil"
@@ -290,21 +290,18 @@ const styles = StyleSheet.create({
     marginBottom: 60,
     gap: 5,
   },
+  modifyButton: {
+    backgroundColor: "#f39c12",
+  },
+  completeButton: {
+    backgroundColor: "#4CAF50",
+  },
   actionButton: {
     backgroundColor: "#00AEEF",
-    flexDirection: "row",
-    justifyContent: "center",
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginBottom: 8,
     alignSelf: "center",
   },
   deleteButton: {
     backgroundColor: "#e53935",
-    flexDirection: "row",
-    justifyContent: "center",
-    paddingVertical: 12,
-    borderRadius: 8,
     alignSelf: "center",
   },
   icon: {
