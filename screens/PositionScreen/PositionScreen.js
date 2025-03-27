@@ -14,6 +14,7 @@ import MapViewDirections from "react-native-maps-directions";
 import { apiRequest } from "../../api/apiClient";
 import "react-native-get-random-values";
 import { createActivity } from "../../api/activityApi";
+import * as SMS from "expo-sms";
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyCYqNe56qzLAp9T4zKAgKuEkHHigcNYc3o";
 
@@ -116,6 +117,26 @@ const PositionScreen = () => {
     return R * c;
   };
 
+  const sendEmergencySMS = async (coords) => {
+    const isAvailable = await SMS.isAvailableAsync();
+
+    if (!isAvailable) {
+      Alert.alert("SMS Unavailable", "This device doesn't support SMS.");
+      return;
+    }
+
+    const message = `🚨 Emergency Alert!\nI'm lost. Here's my location:\nhttps://www.google.com/maps?q=${coords.latitude},${coords.longitude}`;
+    const recipients = ["+44 7598 691456"];
+
+    const { result } = await SMS.sendSMSAsync(recipients, message);
+
+    if (result === "sent") {
+      console.log("SMS sent successfully");
+    } else {
+      console.log("SMS was not sent");
+    }
+  };
+
   const triggerEmergencyAlert = async () => {
     try {
       const now = new Date().toISOString();
@@ -140,6 +161,7 @@ const PositionScreen = () => {
       };
 
       const response = await createActivity(alertActivity);
+      await sendEmergencySMS(location);
 
       console.log("Emergency activity logged:", response);
 

@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Dimensions,
   TouchableOpacity,
+  TextInput,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { getLocations } from "../../api/locationApi";
@@ -16,6 +17,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { deleteLocation } from "../../api/locationApi";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Alert } from "react-native";
+import Button from "../../components/UI/Button";
 
 const { height } = Dimensions.get("window");
 
@@ -24,6 +26,7 @@ const LocationScreen = () => {
   const [loading, setLoading] = useState(true);
   const [region, setRegion] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const navigation = useNavigation();
 
@@ -52,6 +55,10 @@ const LocationScreen = () => {
 
       fetchLocations();
     }, [])
+  );
+
+  const filteredLocations = locations.filter((loc) =>
+    loc.LocationName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleDelete = (locationId) => {
@@ -132,8 +139,15 @@ const LocationScreen = () => {
         </MapView>
       )}
 
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search by location name..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+
       <FlatList
-        data={locations}
+        data={filteredLocations}
         keyExtractor={(item) => item.LocationID.toString()}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
@@ -170,12 +184,12 @@ const LocationScreen = () => {
         )}
       />
 
-      <TouchableOpacity
+      <Button
         style={styles.addButton}
         onPress={() => navigation.navigate("AddLocation")}
       >
         <Icon name="plus" size={18} color="#fff" />
-      </TouchableOpacity>
+      </Button>
     </View>
   );
 };
@@ -219,8 +233,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#888",
   },
+  searchInput: {
+    backgroundColor: "white",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginHorizontal: 15,
+    marginTop: 10,
+    marginBottom: 15,
+    height: 45,
+    borderColor: "#ccc",
+    borderWidth: 1,
+  },
+
   addButton: {
-    backgroundColor: "#007BFF",
+    backgroundColor: "#00AEEF",
     width: 60,
     height: 60,
     borderRadius: 30,

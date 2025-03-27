@@ -105,7 +105,7 @@ const AddLocationScreen = ({ navigation }) => {
           styles={{ textInput: styles.input }}
         />
 
-        <Button onPress={handleSaveLocations}>
+        <Button onPress={handleSaveLocations} style={styles.button}>
           <Text style={styles.buttonText}>Continue to Trip Info</Text>
         </Button>
       </ScrollView>
@@ -134,6 +134,9 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontWeight: "bold",
+  },
+  button: {
+    alignSelf: "center",
   },
 });
 
