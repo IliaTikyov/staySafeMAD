@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -12,8 +12,10 @@ import MapView, { Marker } from "react-native-maps";
 import { getLocations } from "../../api/locationApi";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useNavigation } from "@react-navigation/native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import { useFocusEffect } from "@react-navigation/native";
+import { deleteLocation } from "../../api/locationApi";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { Alert } from "react-native";
 
 const { height } = Dimensions.get("window");
 
@@ -21,32 +23,91 @@ const LocationScreen = () => {
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [region, setRegion] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const data = await getLocations();
-        setLocations(data);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchLocations = async () => {
+        try {
+          setLoading(true);
+          const data = await getLocations();
+          setLocations(data);
 
-        if (data.length > 0) {
-          setRegion({
-            latitude: data[0].LocationLatitude,
-            longitude: data[0].LocationLongitude,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-          });
+          if (data.length > 0) {
+            setRegion({
+              latitude: data[0].LocationLatitude,
+              longitude: data[0].LocationLongitude,
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
+            });
+          }
+        } catch (error) {
+          console.error("Failed to fetch locations:", error);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Failed to fetch locations:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    fetchLocations();
-  }, []);
+      fetchLocations();
+    }, [])
+  );
+
+  const handleDelete = (locationId) => {
+    Alert.alert(
+      "Delete Location",
+      "Are you sure you want to delete this location?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteLocation(locationId);
+
+              const updated = locations.filter(
+                (loc) => loc.LocationID !== locationId
+              );
+              setLocations(updated);
+
+              if (selectedLocation?.LocationID === locationId) {
+                setSelectedLocation(null);
+                if (updated.length > 0) {
+                  setRegion({
+                    latitude: updated[0].LocationLatitude,
+                    longitude: updated[0].LocationLongitude,
+                    latitudeDelta: 0.05,
+                    longitudeDelta: 0.05,
+                  });
+                } else {
+                  setRegion(null);
+                }
+              }
+            } catch (err) {
+              console.error("Error deleting location:", err);
+              alert("Failed to delete location.");
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleCardPress = (location) => {
+    setSelectedLocation(location);
+    setRegion({
+      latitude: location.LocationLatitude,
+      longitude: location.LocationLongitude,
+      latitudeDelta: 0.02,
+      longitudeDelta: 0.02,
+    });
+  };
+
   if (loading) {
     return (
       <ActivityIndicator size="large" color="#42a5f5" style={styles.loader} />
@@ -57,7 +118,7 @@ const LocationScreen = () => {
     <View style={styles.container}>
       {region && (
         <MapView style={styles.map} region={region}>
-          {locations.map((loc) => (
+          {(selectedLocation ? [selectedLocation] : locations).map((loc) => (
             <Marker
               key={loc.LocationID}
               coordinate={{
@@ -76,21 +137,36 @@ const LocationScreen = () => {
         keyExtractor={(item) => item.LocationID.toString()}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.title}>{item.LocationName}</Text>
-            <Text style={styles.description}>
-              <FontAwesome5 name="info-circle" size={14} color="#555" />{" "}
-              {item.LocationDescription}
-            </Text>
-            <Text style={styles.address}>
-              <FontAwesome5 name="map-marker-alt" size={14} color="tomato" />{" "}
-              {item.LocationAddress}
-            </Text>
-            <Text style={styles.coords}>
-              <FontAwesome5 name="globe" size={14} color="teal" />{" "}
-              {item.LocationLatitude}, {item.LocationLongitude}
-            </Text>
-          </View>
+          <TouchableOpacity onPress={() => handleCardPress(item)}>
+            <View
+              style={[
+                styles.card,
+                selectedLocation?.LocationID === item.LocationID && {
+                  borderColor: "#007BFF",
+                  borderWidth: 3,
+                },
+              ]}
+            >
+              <View style={styles.cardHeader}>
+                <Text style={styles.title}>{item.LocationName}</Text>
+                <TouchableOpacity onPress={() => handleDelete(item.LocationID)}>
+                  <Icon name="trash" size={18} color="red" />
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.description}>
+                <FontAwesome5 name="info-circle" size={14} color="#555" />{" "}
+                {item.LocationDescription}
+              </Text>
+              <Text style={styles.address}>
+                <FontAwesome5 name="map-marker-alt" size={14} color="tomato" />{" "}
+                {item.LocationAddress}
+              </Text>
+              <Text style={styles.coords}>
+                <FontAwesome5 name="globe" size={14} color="teal" />{" "}
+                {item.LocationLatitude}, {item.LocationLongitude}
+              </Text>
+            </View>
+          </TouchableOpacity>
         )}
       />
 
@@ -98,7 +174,7 @@ const LocationScreen = () => {
         style={styles.addButton}
         onPress={() => navigation.navigate("AddLocation")}
       >
-        <Ionicons name="add" size={28} color="#fff" />
+        <Icon name="plus" size={18} color="#fff" />
       </TouchableOpacity>
     </View>
   );
@@ -125,7 +201,6 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginBottom: 12,
-    elevation: 2,
   },
   title: {
     fontWeight: "bold",
@@ -151,15 +226,20 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
-    elevation: 5,
+    elevation: 2,
     position: "absolute",
     bottom: 20,
     right: 20,
     shadowColor: "#000",
     shadowOpacity: 0.2,
-    shadowRadius: 5,
+    shadowRadius: 2,
     shadowOffset: { width: 0, height: 2 },
-    zIndex: 10,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 5,
   },
 });
 

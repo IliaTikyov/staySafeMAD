@@ -80,7 +80,7 @@ const AddingLocationScreen = ({ navigation }) => {
         styles={{ textInput: styles.input }}
       />
 
-      <Button onPress={handleSubmit}>
+      <Button style={styles.addButton} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Add Location</Text>
       </Button>
     </KeyboardAvoidingView>
@@ -107,6 +107,9 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontWeight: "bold",
+  },
+  addButton: {
+    alignSelf: "center",
   },
 });
 

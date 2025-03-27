@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f8f9fa",
     paddingTop: 16,
+    marginBottom: 20,
   },
   buttonContainer: {
     alignItems: "center",
