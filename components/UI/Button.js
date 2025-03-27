@@ -15,7 +15,7 @@ const Button = ({ children, onPress, style, textStyle }) => {
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    backgroundColor: "#00AEEF",
+    backgroundColor: "#3498db",
     width: "80%",
     height: 50,
     marginVertical: 10,
