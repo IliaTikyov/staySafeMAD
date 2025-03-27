@@ -2,7 +2,7 @@
 //!!!!!!!!!!!!!!!!!!!!!!If http://localhost:5000/staysafe/v1/api is not working!!!!!!!!!!!!!!!!!!!!!!!
 
 //!!!!!!!!!!!!!!!!!!!!!Replace it with your ipv4 address!!!!!!!!!!!!!!!!!!!!!!!! muhammad's home ipv4 address '192.168.0.95' !!!
-const API_BASE_URL = "http://10.154.70.185:5000/staysafe/v1/api"; // Muhammad's home ipv4 address
+const API_BASE_URL = "http://192.168.0.95:5000/staysafe/v1/api"; // Muhammad's home ipv4 address
 
 //!!!!!!!!!!!!!!!!!!!!!Replace it with your ipv4 address!!!!!!!!!!!!!!!!!!!!!!!!
 
