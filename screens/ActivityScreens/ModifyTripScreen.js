@@ -10,7 +10,7 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import Button from "../../components/UI/Button";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { SaveIcon } from "../../components/UI/Icons";
 import { updateActivity } from "../../api/activityApi";
 
 const ModifyTripScreen = () => {
@@ -27,11 +27,11 @@ const ModifyTripScreen = () => {
   );
 
   const statusOptions = [
-    { id: 1, label: "Planned", color: "#3498db" },
-    { id: 2, label: "Started", color: "#f39c12" },
-    { id: 3, label: "Paused", color: "#f1c40f" },
-    { id: 4, label: "Cancelled", color: "#e74c3c" },
-    { id: 5, label: "Completed", color: "#2ecc71" },
+    { id: 1, label: "Planned" },
+    { id: 2, label: "Started" },
+    { id: 3, label: "Paused" },
+    { id: 4, label: "Cancelled" },
+    { id: 5, label: "Completed" },
   ];
 
   const handleSave = async () => {
@@ -106,7 +106,7 @@ const ModifyTripScreen = () => {
 
       <View style={styles.buttonWrap}>
         <Button onPress={handleSave}>
-          <Icon name="save" size={14} style={{ marginRight: 8 }} />
+          <SaveIcon size={16} color="white" style={{ marginRight: 6 }} />
           <Text> Save Changes </Text>
         </Button>
       </View>
@@ -137,7 +137,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   picker: {
-    borderColor: "#ccc",
     backgroundColor: "#f0f0f0",
     marginBottom: 20,
   },

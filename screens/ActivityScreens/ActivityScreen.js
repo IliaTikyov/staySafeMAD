@@ -1,15 +1,9 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, FlatList, StyleSheet } from "react-native";
 import { getActivities } from "../../api/activityApi";
 import Cards from "../../components/UI/Cards";
 import Button from "../../components/UI/Button";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { PlusIcon } from "../../components/UI/Icons";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 const ActivityScreen = () => {
@@ -64,7 +58,7 @@ const ActivityScreen = () => {
     <View style={styles.container}>
       <View style={styles.buttonContainer}>
         <Button onPress={() => navigation.navigate("Add Locations")}>
-          <Icon name="plus" size={14} style={styles.plusIcon} />
+          <PlusIcon size={14} style={styles.plusIcon} />
           <Text> Add Activity (Trips)</Text>
         </Button>
       </View>
@@ -80,15 +74,13 @@ const ActivityScreen = () => {
               })
             }
           >
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-              {item.ActivityName}
-            </Text>
+            <Text style={styles.tripText}>{item.ActivityName}</Text>
             <Text>{item.ActivityDescription}</Text>
             <Text
-              style={{
-                fontWeight: "bold",
-                color: getStatusColor(item.ActivityStatusName),
-              }}
+              style={[
+                styles.status,
+                { color: getStatusColor(item.ActivityStatusName) },
+              ]}
             >
               Status: {item.ActivityStatusName}
             </Text>
@@ -115,7 +107,7 @@ const styles = StyleSheet.create({
   },
   tripText: {
     fontSize: 16,
-    color: "#333",
+    fontWeight: "bold",
     marginBottom: 5,
   },
   status: {

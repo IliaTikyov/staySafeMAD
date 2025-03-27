@@ -15,7 +15,12 @@ import { getLocationById } from "../../api/locationApi";
 import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import Button from "../../components/UI/Button";
-import Icon from "react-native-vector-icons/FontAwesome";
+import {
+  StartIcon,
+  CompleteIcon,
+  ModifyIcon,
+  DeleteIcon,
+} from "../../components/UI/Icons";
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyCYqNe56qzLAp9T4zKAgKuEkHHigcNYc3o";
 
@@ -56,8 +61,6 @@ const ViewTripScreen = () => {
           ) {
             setFromCoords({ latitude: fromLat, longitude: fromLng });
             setToCoords({ latitude: toLat, longitude: toLng });
-          } else {
-            console.warn("Invalid coordinates received from API");
           }
         }
       } catch (err) {
@@ -181,40 +184,28 @@ const ViewTripScreen = () => {
                 onPress={() => changeStatus(2)}
                 style={styles.actionButton}
               >
-                <Icon name="play" size={16} color="white" style={styles.icon} />
+                <StartIcon />
                 <Text> Start </Text>
               </Button>
+
               <Button
                 onPress={() => changeStatus(5)}
                 style={[styles.actionButton, styles.completeButton]}
               >
-                <Icon
-                  name="check"
-                  size={16}
-                  color="white"
-                  style={styles.icon}
-                />
+                <CompleteIcon />
                 <Text> Complete </Text>
               </Button>
+
               <Button
                 onPress={() => navigation.navigate("Modify", { activity })}
                 style={[styles.actionButton, styles.modifyButton]}
               >
-                <Icon
-                  name="pencil"
-                  size={16}
-                  color="white"
-                  style={styles.icon}
-                />
+                <ModifyIcon />
                 <Text> Modify </Text>
               </Button>
+
               <Button onPress={handleDelete} style={styles.deleteButton}>
-                <Icon
-                  name="trash"
-                  size={16}
-                  color="white"
-                  style={styles.icon}
-                />
+                <DeleteIcon />
                 <Text> Delete </Text>
               </Button>
             </View>
@@ -290,22 +281,19 @@ const styles = StyleSheet.create({
     marginBottom: 60,
     gap: 5,
   },
+  actionButton: {
+    backgroundColor: "#00AEEF",
+    alignSelf: "center",
+  },
   modifyButton: {
     backgroundColor: "#f39c12",
   },
   completeButton: {
     backgroundColor: "#4CAF50",
   },
-  actionButton: {
-    backgroundColor: "#00AEEF",
-    alignSelf: "center",
-  },
   deleteButton: {
     backgroundColor: "#e53935",
     alignSelf: "center",
-  },
-  icon: {
-    marginRight: 6,
   },
 });
 

@@ -12,6 +12,7 @@ import {
 import { createLocation } from "../../api/locationApi";
 import Button from "../../components/UI/Button";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import { FromIcon, ToIcon } from "../../components/UI/Icons";
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyCYqNe56qzLAp9T4zKAgKuEkHHigcNYc3o";
 LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
@@ -95,7 +96,9 @@ const AddLocationScreen = ({ navigation }) => {
         </Text>
 
         <View style={[styles.section, { zIndex: 2 }]}>
-          <Text style={styles.label}>🚩 From Location</Text>
+          <Text style={styles.label}>
+            <FromIcon /> From Location
+          </Text>
           <GooglePlacesAutocomplete
             placeholder="Enter starting point"
             fetchDetails={true}
@@ -110,7 +113,9 @@ const AddLocationScreen = ({ navigation }) => {
         </View>
 
         <View style={[styles.section, { zIndex: 1 }]}>
-          <Text style={styles.label}>🏁 To Location</Text>
+          <Text style={styles.label}>
+            <ToIcon /> To Location
+          </Text>
           <GooglePlacesAutocomplete
             placeholder="Enter destination"
             fetchDetails={true}

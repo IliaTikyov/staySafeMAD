@@ -10,9 +10,9 @@ import {
   Platform,
 } from "react-native";
 import Button from "../../components/UI/Button";
-import Icon from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
 import { createActivity } from "../../api/activityApi";
+import { CheckIcon } from "../../components/UI/Icons";
 
 const statusOptions = [
   { id: "1", label: "Planned", color: "#3498db" },
@@ -96,6 +96,7 @@ const AddTripScreen = ({ route, navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.stepIndicator}>Step 2 of 2</Text>
+
         <Text style={styles.label}>Trip Name</Text>
         <TextInput
           style={styles.input}
@@ -145,7 +146,7 @@ const AddTripScreen = ({ route, navigation }) => {
 
         <View style={styles.buttonContainer}>
           <Button onPress={handleSubmit}>
-            <Icon name="check" size={14} style={styles.plusIcon} />
+            <CheckIcon style={styles.icon} />
             <Text> Submit Activity </Text>
           </Button>
         </View>
@@ -190,8 +191,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
-  plusIcon: {
-    color: "white",
+  icon: {
     marginRight: 6,
   },
 });
