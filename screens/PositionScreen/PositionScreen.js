@@ -6,6 +6,7 @@ import {
   Alert,
   TouchableOpacity,
   Text,
+  TextInput,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
@@ -13,7 +14,6 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import MapViewDirections from "react-native-maps-directions";
 import { apiRequest } from "../../api/apiClient";
 import "react-native-get-random-values";
-import { createActivity } from "../../api/activityApi";
 import * as SMS from "expo-sms";
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyCYqNe56qzLAp9T4zKAgKuEkHHigcNYc3o";
@@ -23,6 +23,8 @@ const PositionScreen = () => {
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [destination, setDestination] = useState(null);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [showPhonePrompt, setShowPhonePrompt] = useState(false);
 
   useEffect(() => {
     let locationSubscription;
@@ -118,62 +120,21 @@ const PositionScreen = () => {
   };
 
   const sendEmergencySMS = async (coords) => {
-    const isAvailable = await SMS.isAvailableAsync();
+    if (!phoneNumber) {
+      setShowPhonePrompt(true);
+      return;
+    }
 
+    const isAvailable = await SMS.isAvailableAsync();
     if (!isAvailable) {
       Alert.alert("SMS Unavailable", "This device doesn't support SMS.");
       return;
     }
 
-    const message = `🚨 Emergency Alert!\nI'm lost. Here's my location:\nhttps://www.google.com/maps?q=${coords.latitude},${coords.longitude}`;
-    const recipients = ["+44 7598 691456"];
+    const message = `Emergency Alert!\nI'm lost. Here's my location:\nhttps://www.google.com/maps?q=${coords.latitude},${coords.longitude}`;
+    const recipients = [phoneNumber];
 
-    const { result } = await SMS.sendSMSAsync(recipients, message);
-
-    if (result === "sent") {
-      console.log("SMS sent successfully");
-    } else {
-      console.log("SMS was not sent");
-    }
-  };
-
-  const triggerEmergencyAlert = async () => {
-    try {
-      const now = new Date().toISOString();
-
-      //This data  needs to be replaced later. Right now it hardcoded for testing purposes.
-      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      const alertActivity = {
-        ActivityID: 1,
-        ActivityName: "EMERGENCY ALERT",
-        ActivityUserID: 1,
-        ActivityDescription: "User triggered emergency alert via panic button.",
-        ActivityFromID: 10,
-        ActivityLeave: now,
-        ActivityToID: 8,
-        ActivityArrive: now,
-        ActivityStatusID: 5,
-
-        ActivityUsername: "aishaahmed",
-        ActivityFromName: "Current Location",
-        ActivityToName: "Unknown / Emergency",
-        ActivityStatusName: "Completed",
-      };
-
-      const response = await createActivity(alertActivity);
-      await sendEmergencySMS(location);
-
-      console.log("Emergency activity logged:", response);
-
-      Alert.alert(
-        "Emergency Alert Sent",
-        "An emergency alert has been logged.",
-        [{ text: "OK" }]
-      );
-    } catch (err) {
-      console.error("Failed to log alert:", err);
-      Alert.alert("Error", "Could not send alert.");
-    }
+    await SMS.sendSMSAsync(recipients, message);
   };
 
   return (
@@ -262,10 +223,44 @@ const PositionScreen = () => {
                 />
               )}
           </MapView>
+          {showPhonePrompt && (
+            <View style={styles.phonePrompt}>
+              <Text style={styles.inputLabel}>Enter your phone number:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="+44 1234 567890"
+                keyboardType="phone-pad"
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+              />
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={() => {
+                  if (!phoneNumber) {
+                    Alert.alert(
+                      "Missing Number",
+                      "Please enter your phone number."
+                    );
+                    return;
+                  }
+                  setShowPhonePrompt(false);
+                  sendEmergencySMS(location);
+                }}
+              >
+                <Text style={styles.submitText}>Send Emergency SMS</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           <TouchableOpacity
             style={styles.panicButton}
-            onPress={triggerEmergencyAlert}
+            onPress={() => {
+              if (!phoneNumber) {
+                setShowPhonePrompt(true);
+              } else {
+                sendEmergencySMS(location);
+              }
+            }}
           >
             <Text style={styles.panicText}>PANIC</Text>
           </TouchableOpacity>
@@ -294,12 +289,56 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 50,
     right: 20,
-    elevation: 5,
+    elevation: 2,
   },
   panicText: {
     color: "white",
     fontWeight: "bold",
     fontSize: 18,
+  },
+  inputContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "white",
+  },
+  inputLabel: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  input: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "gray",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 20,
+  },
+  submitButton: {
+    backgroundColor: "#3498db",
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+  },
+  submitText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  phonePrompt: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    position: "absolute",
+    bottom: 120,
+    left: 20,
+    right: 20,
+    elevation: 2,
   },
 });
 

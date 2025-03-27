@@ -34,6 +34,8 @@ const AddingLocationScreen = ({ navigation }) => {
       return;
     }
 
+    //Warning This code was placed to ensure that address is at least 16 characters long.
+    //This is due to db constraints.
     const ensureAddressLength = (address) => {
       if (!address) return "Unknown Street, Default Road";
       return address.length >= 16 ? address : address + " Extra Details Road";
