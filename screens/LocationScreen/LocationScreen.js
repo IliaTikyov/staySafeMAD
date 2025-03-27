@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,10 +6,14 @@ import {
   StyleSheet,
   ActivityIndicator,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { getLocations } from "../../api/locationApi";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { useNavigation } from "@react-navigation/native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { useFocusEffect } from "@react-navigation/native";
 
 const { height } = Dimensions.get("window");
 
@@ -17,6 +21,8 @@ const LocationScreen = () => {
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [region, setRegion] = useState(null);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchLocations = async () => {
@@ -41,7 +47,6 @@ const LocationScreen = () => {
 
     fetchLocations();
   }, []);
-
   if (loading) {
     return (
       <ActivityIndicator size="large" color="#42a5f5" style={styles.loader} />
@@ -88,6 +93,13 @@ const LocationScreen = () => {
           </View>
         )}
       />
+
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => navigation.navigate("AddLocation")}
+      >
+        <Ionicons name="add" size={28} color="#fff" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -131,6 +143,23 @@ const styles = StyleSheet.create({
   coords: {
     fontSize: 12,
     color: "#888",
+  },
+  addButton: {
+    backgroundColor: "#007BFF",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5,
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    zIndex: 10,
   },
 });
 

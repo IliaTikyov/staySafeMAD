@@ -8,6 +8,7 @@ export const getLocationById = async (locationId) => {
 export const createLocation = async (locationData) => {
   const response = await apiRequest("/locations", "POST", locationData);
   console.log("Create Location Response:", response);
+
   return response; // This must include LocationID
 };
 export const getLocations = async () => {
