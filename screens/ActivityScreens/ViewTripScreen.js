@@ -287,7 +287,8 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 16,
-    gap: 10,
+    marginBottom: 60,
+    gap: 5,
   },
   actionButton: {
     backgroundColor: "#00AEEF",
@@ -296,6 +297,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
     marginBottom: 8,
+    alignSelf: "center",
   },
   deleteButton: {
     backgroundColor: "#e53935",
@@ -303,6 +305,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 12,
     borderRadius: 8,
+    alignSelf: "center",
   },
   icon: {
     marginRight: 6,
