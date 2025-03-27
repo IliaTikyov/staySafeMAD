@@ -106,7 +106,7 @@ const ModifyTripScreen = () => {
 
       <View style={styles.buttonWrap}>
         <Button onPress={handleSave}>
-          <SaveIcon size={16} color="white" style={{ marginRight: 6 }} />
+          <SaveIcon />
           <Text> Save Changes </Text>
         </Button>
       </View>
